@@ -5,7 +5,7 @@ function Admin() {
   const [orders, setOrders] = useState([]);
 
   const loadOrders = () => {
-    fetch("http://localhost:5000/orders")
+    fetch("https://the-shakes-reign.onrender.com/orders")
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((error) => console.error(error));

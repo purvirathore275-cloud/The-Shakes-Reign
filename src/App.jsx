@@ -171,7 +171,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/orders",
+      fetch("https://the-shakes-reign.onrender.com/orders", {
         {
           method: "POST",
           headers: {
