@@ -171,15 +171,15 @@ function App() {
 
     try {
       const response = await fetch(
-      fetch("https://the-shakes-reign.onrender.com/orders", {
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(order),
-        }
-      );
+  "https://the-shakes-reign.onrender.com/orders",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  }
+);
 
       if (!response.ok) {
         throw new Error("Order could not be saved");
