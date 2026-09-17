@@ -1,8 +1,7 @@
 import http from "http";
 import fs from "fs";
 
-const PORT = 5000;
-
+const PORT = process.env.PORT || 5000;
 const server = http.createServer((req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -127,6 +126,6 @@ const server = http.createServer((req, res) => {
   );
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
