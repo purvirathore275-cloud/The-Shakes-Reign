@@ -1,3 +1,4 @@
+import logo from "./assets/logo.jpg";
 import { useState } from "react";
 import "./App.css";
 import Admin from "./admin/Admin";
@@ -233,8 +234,8 @@ function App() {
               {/* NAVBAR */}
               <header className="navbar">
                 <div className="logo">
-                  The Shakes Reign
-                </div>
+  <img src="/logo.jpg" alt="The Shakes Reign" />
+</div>
 
                 <nav>
                   <a href="#home">Home</a>
@@ -296,8 +297,8 @@ function App() {
                 <div className="hero-visual">
 
                   <div className="shake-circle">
-                    🥤
-                  </div>
+  <img src="/logo.jpg" alt="The Shakes Reign" />
+</div>
 
                   <div className="floating-card card-one">
                     ❤️ Fresh & Delicious

@@ -42,7 +42,8 @@ a {
   justify-content: space-between;
 
   background: #fff8ef;
-  border-bottom: 1px solid #f0dfcc;
+  border-bottom: 1px solid #eeeeee;
+  
 
   position: sticky;
   top: 0;
@@ -50,9 +51,15 @@ a {
 }
 
 .logo {
-  font-size: 25px;
-  font-weight: 800;
-  color: #8f351b;
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  display: block;
 }
 
 .navbar nav {
@@ -95,19 +102,15 @@ a {
 ========================= */
 
 .hero-section {
-  min-height: 650px;
-  padding: 80px 7%;
-
+  min-height: 620px;
+  padding: 50px 7%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 60px;
-
-  background:
-    radial-gradient(circle at 85% 45%, #ffe2bd 0%, transparent 30%),
-    #fff8ef;
+  gap: 40px;
+  background: #fff8ef;
+  overflow: hidden;
 }
-
 .hero-content {
   max-width: 600px;
 }
@@ -191,30 +194,30 @@ a {
    HERO VISUAL
 ========================= */
 
-.hero-visual {
-  width: 450px;
-  height: 450px;
-
+..hero-visual {
+  width: 50%;
+  height: 500px;
   position: relative;
-
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+}
+.shake-circle {
+  width: 430px;
+  height: 470px;
+  overflow: hidden;
+  border-radius: 0 0 90px 0;
+  position: relative;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 
-.shake-circle {
-  width: 330px;
-  height: 330px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: linear-gradient(145deg, #d7262e, #b5121b);
-
-  font-size: 125px;
+.shake-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center ;
+  display: block;
+}
 
   box-shadow:
     0 30px 60px rgba(118, 54, 22, 0.2),
@@ -291,25 +294,21 @@ a {
   grid-template-columns: repeat(3, 1fr);
   gap: 22px;
 }
-
 .category-card {
   padding: 35px 25px;
 
-  border: 1px solid #f0dfcc;
+  border: 1px solid #eeeeee;
   border-radius: 20px;
 
-  background: #fffaf5;
-
+  background: #ffffff;
   transition: 0.3s;
 }
 
 .category-card:hover {
   transform: translateY(-8px);
 
-  box-shadow: 0 18px 40px rgba(85, 43, 20, 0.1);
-
-  border-color: #e6b995;
-}
+  box-shadow: 0 18px 40px rgba(31, 31, 31, 0.1);
+  border-color: #b5121b;
 
 .category-icon {
   width: 70px;
@@ -404,7 +403,7 @@ a {
   margin-bottom: 30px;
 
   font-size: 17px;
-  color: #80695d;
+  color: #666666;
 }
 
 
@@ -604,7 +603,7 @@ footer p:last-child {
 
 .menu-heading > p:last-child {
   font-size: 16px;
-  color: #80695d;
+  color: #666666;
 }
 
 
@@ -639,14 +638,10 @@ footer p:last-child {
 
 .menu-card {
   overflow: hidden;
-
-  border: 1px solid #f0dfcc;
+  border: 1px solid #eeeeee;
   border-radius: 20px;
-
-  background: #fffaf5;
-
-  box-shadow: 0 8px 25px rgba(70, 35, 20, 0.06);
-
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(31, 31, 31, 0.08);
   transition: 0.3s;
 }
 
@@ -665,7 +660,7 @@ footer p:last-child {
   width: 100%;
   height: 210px;
   overflow: hidden;
-  background: #f5e5d5;
+  background: #ffffff;
 }
 
 .menu-image img {
@@ -786,39 +781,36 @@ footer p:last-child {
 
 .cart-section {
   padding: 90px 7%;
-  background: #faf7f2;
+  background: #ffffff;
   text-align: center;
 }
 
 .cart-section h2 {
   margin: 10px 0 35px;
   font-size: 42px;
-  color: #2b1710 !important;
+  color: #1f1f1f !important;
 }
 
 .cart-section h2 span {
   color: #b5121b;
 }
+}
 
 .empty-cart {
-  color: #80695d;
+  color: #666666;
   font-size: 17px;
+};
 }
 
 .cart-box {
   max-width: 750px;
   margin: 0 auto;
-
   padding: 25px;
-
   background: white;
-
-  border: 1px solid #eadcdc;
+  border: 1px solid #eeeeee;
   border-radius: 20px;
-
-  box-shadow: 0 10px 30px rgba(70, 35, 20, 0.08);
+  box-shadow: 0 10px 30px rgba(31, 31, 31, 0.08);
 }
-
 .cart-item {
   display: flex;
   justify-content: space-between;
@@ -844,16 +836,12 @@ footer p:last-child {
 .cart-total {
   display: flex;
   justify-content: space-between;
-
   margin-top: 20px;
   padding-top: 20px;
-
   border-top: 2px solid #b5121b;
-
   font-size: 22px;
   font-weight: 800;
-
-  color: #2b1710;
+  color: #1f1f1f;
 }
 
 .cart-total strong {
