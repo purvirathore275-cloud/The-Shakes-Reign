@@ -15,7 +15,7 @@ html {
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: #fff8ef;
-  color: #2b1710;
+  color: #1f1f1f;
 }
 
 a {
@@ -279,7 +279,7 @@ a {
   font-size: clamp(35px, 5vw, 55px);
   line-height: 1.1;
 
-  color: #2b1710;
+  color: #1f1f1f;
 }
 
 .categories h2 span {
@@ -309,6 +309,7 @@ a {
 
   box-shadow: 0 18px 40px rgba(31, 31, 31, 0.1);
   border-color: #b5121b;
+}
 
 .category-icon {
   width: 70px;
@@ -396,7 +397,7 @@ a {
 
   font-size: clamp(35px, 5vw, 55px);
 
-  color: #2b1710;
+  color: #1f1f1f;
 }
 
 .contact-section > p:not(.section-tag) {
@@ -594,7 +595,7 @@ footer p:last-child {
   margin-bottom: 15px;
   font-size: clamp(38px, 5vw, 58px);
   line-height: 1.1;
-  color: #2b1710;
+  color: #1f1f1f;
 }
 
 .menu-heading h2 span {
@@ -794,12 +795,10 @@ footer p:last-child {
 .cart-section h2 span {
   color: #b5121b;
 }
-}
 
 .empty-cart {
   color: #666666;
   font-size: 17px;
-};
 }
 
 .cart-box {
