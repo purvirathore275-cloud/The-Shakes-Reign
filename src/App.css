@@ -1,6 +1,6 @@
 /* =========================
    GLOBAL
-
+========================= */
 
 * {
   margin: 0;
@@ -31,6 +31,7 @@ a {
 
 /* =========================
    NAVBAR
+========================= */
 
 .navbar {
   width: 100%;
@@ -55,12 +56,12 @@ a {
 }
 
 .logo img {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
+  width: 110px;
+  height: 50px;
+  object-fit: cover;
+  object-position: center 35%;
   display: block;
 }
-
 .navbar nav {
   display: flex;
   gap: 35px;
@@ -98,7 +99,7 @@ a {
 
 /* =========================
    HERO
-
+========================= */
 
 .hero-section {
   min-height: 620px;
@@ -110,6 +111,7 @@ a {
   background: #fff8ef;
   overflow: hidden;
 }
+
 .hero-content {
   max-width: 600px;
 }
@@ -191,8 +193,8 @@ a {
 
 /* =========================
    HERO VISUAL
-
-..hero-visual {
+========================= */
+.hero-visual {
   width: 50%;
   height: 500px;
   position: relative;
@@ -206,37 +208,29 @@ a {
   overflow: hidden;
   border-radius: 0 0 90px 0;
   position: relative;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+
+  box-shadow:
+    0 30px 60px rgba(31, 31, 31, 0.2),
+    inset 0 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .shake-circle img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center ;
+  object-position: center;
   display: block;
-}
-
-  box-shadow:
-    0 30px 60px rgba(118, 54, 22, 0.2),
-    inset 0 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .floating-card {
   position: absolute;
-
   padding: 14px 20px;
-
   border-radius: 15px;
-
   background: rgba(255, 255, 255, 0.95);
-
-  box-shadow: 0 15px 35px rgba(70, 35, 20, 0.12);
-
+  box-shadow: 0 15px 35px rgba(31, 31, 31, 0.12);
   font-size: 14px;
   font-weight: 700;
-
-  color: #4b2b20;
+  color: #333333;
 }
 
 .card-one {
@@ -252,8 +246,7 @@ a {
 
 /* =========================
    CATEGORIES
-
-
+========================= */
 .categories {
   padding: 100px 7%;
   text-align: center;
@@ -341,6 +334,7 @@ a {
 
 /* =========================
    ABOUT
+========================= */
 
 .about-section {
   padding: 110px 12%;
@@ -379,7 +373,7 @@ a {
 
 /* =========================
    CONTACT
-
+========================= */
 
 .contact-section {
   padding: 100px 7%;
@@ -407,8 +401,7 @@ a {
 
 /* =========================
    FOOTER
-
-
+========================= */
 footer {
   padding: 30px 7%;
 
@@ -430,7 +423,7 @@ footer p:last-child {
 
 /* =========================
    RESPONSIVE
-
+========================= */
 
 @media (max-width: 900px) {
 
@@ -576,8 +569,7 @@ footer p:last-child {
 }
 /* =========================
    MENU SECTION
-
-
+========================= */
 .menu-section {
   padding: 100px 7%;
   background: #ffffff;
@@ -735,6 +727,7 @@ footer p:last-child {
 
 /* =========================
    MENU RESPONSIVE
+========================= */
 
 @media (max-width: 900px) {
 
@@ -774,7 +767,7 @@ footer p:last-child {
 }
 /* =========================
    CART SECTION
-
+========================= */
 
 .cart-section {
   padding: 90px 7%;
