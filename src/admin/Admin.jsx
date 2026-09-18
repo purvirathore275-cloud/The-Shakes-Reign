@@ -213,29 +213,31 @@ const addCategory = async () => {
   // TOGGLE STOCK
   // =========================
 
-  const toggleAvailability = async (id) => {
-    try {
-      const response = await fetch(
-        `${API}/menu/${encodeURIComponent(id)}/toggle`,
-        {
-          method: "PATCH",
-        }
-      );
+  const toggleAvailability = async (event, id) => {
+  event.preventDefault();
+  event.stopPropagation();
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Could not update availability.");
-        return;
+  try {
+    const response = await fetch(
+      `${API}/menu/${encodeURIComponent(id)}/toggle`,
+      {
+        method: "PATCH",
       }
+    );
 
-      await loadMenu();
-    } catch (error) {
-      console.error("Toggle error:", error);
-      alert("Backend connection failed.");
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Could not update availability.");
+      return;
     }
-  };
 
+    await loadMenu();
+  } catch (error) {
+    console.error("Toggle error:", error);
+    alert("Backend connection failed.");
+  }
+};
   // =========================
   // DELETE DISH
   // =========================
@@ -608,19 +610,20 @@ const addCategory = async () => {
                   <div className="menu-admin-actions">
 
                     <button
-                      className={
-                        item.available
-                          ? "stock-btn available"
-                          : "stock-btn unavailable"
-                      }
-                      onClick={() =>
-                        toggleAvailability(item.id)
-                      }
-                    >
-                      {item.available
-                        ? "🟢 Available"
-                        : "🔴 Out of Stock"}
-                    </button>
+  type="button"
+  className={
+    item.available
+      ? "stock-btn available"
+      : "stock-btn unavailable"
+  }
+  onClick={(event) =>
+    toggleAvailability(event, item.id)
+  }
+>
+  {item.available
+    ? "🟢 Available"
+    : "🔴 Out of Stock"}
+</button>
 
                     <button
                       className="delete-dish-btn"
