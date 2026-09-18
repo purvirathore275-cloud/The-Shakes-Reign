@@ -138,7 +138,10 @@ const server = http.createServer(async (req, res) => {
   // GET MENU
   // =========================
 
-  if (req.method === "GET" && req.url === "/menu") {
+if (
+  req.method === "GET" &&
+  (req.url === "/menu" || req.url === "/menu/")
+) {
     const menu = readJsonFile(MENU_FILE);
 
     sendJson(res, 200, menu);
