@@ -2,65 +2,41 @@ import http from "http";
 import fs from "fs";
 
 const PORT = process.env.PORT || 5000;
-const server = http.createServer((req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // CORS preflight
-  if (req.method === "OPTIONS") {
-    res.statusCode = 200;
-    res.end();
-    return;
-  }
+const ORDERS_FILE = "./src/backend/order.json";
+const MENU_FILE = "./src/backend/menu.json";
 
-  // Test route
-  if (req.method === "GET" && req.url === "/") {
-    res.statusCode = 200;
-
-    res.end(
-      JSON.stringify({
-        message: "The Shakes Reign Backend is running!",
-      })
-    );
-
-    return;
-  }
-
-  // Get all orders
-  if (req.method === "GET" && req.url === "/orders") {
-    try {
-      let orders = [];
-
-      if (fs.existsSync("./src/backend/order.json")) {
-        const data = fs.readFileSync(
-          "./src/backend/order.json",
-          "utf8"
-        );
-
-        if (data.trim()) {
-          orders = JSON.parse(data);
-        }
-      }
-
-      res.statusCode = 200;
-      res.end(JSON.stringify(orders));
-    } catch (error) {
-      res.statusCode = 500;
-
-      res.end(
-        JSON.stringify({
-          message: "Could not read orders",
-        })
-      );
+function readJsonFile(file) {
+  try {
+    if (!fs.existsSync(file)) {
+      return [];
     }
 
-    return;
-  }
+    const data = fs.readFileSync(file, "utf8");
 
-  // Create new order
-  if (req.method === "POST" && req.url === "/orders") {
+    if (!data.trim()) {
+      return [];
+    }
+
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(`Error reading ${file}:`, error);
+    return [];
+  }
+}
+
+function writeJsonFile(file, data) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+
+function sendJson(res, statusCode, data) {
+  res.statusCode = statusCode;
+  res.setHeader("Content-Type", "application/json");
+  res.end(JSON.stringify(data));
+}
+
+function getBody(req) {
+  return new Promise((resolve, reject) => {
     let body = "";
 
     req.on("data", (chunk) => {
@@ -69,63 +45,414 @@ const server = http.createServer((req, res) => {
 
     req.on("end", () => {
       try {
-        const order = JSON.parse(body);
-
-        let orders = [];
-
-        if (fs.existsSync("./src/backend/order.json")) {
-          const data = fs.readFileSync(
-            "./src/backend/order.json",
-            "utf8"
-          );
-
-          if (data.trim()) {
-            orders = JSON.parse(data);
-          }
-        }
-
-        orders.push({
-          id: Date.now(),
-          ...order,
-          createdAt: new Date().toISOString(),
-        });
-
-        fs.writeFileSync(
-          "./src/backend/order.json",
-          JSON.stringify(orders, null, 2)
-        );
-
-        res.statusCode = 201;
-
-        res.end(
-          JSON.stringify({
-            message: "Order received successfully!",
-          })
-        );
+        resolve(body ? JSON.parse(body) : {});
       } catch (error) {
-        res.statusCode = 400;
-
-        res.end(
-          JSON.stringify({
-            message: "Invalid order data",
-          })
-        );
+        reject(error);
       }
+    });
+
+    req.on("error", reject);
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
+
+  // CORS
+  if (req.method === "OPTIONS") {
+    res.statusCode = 200;
+    res.end();
+    return;
+  }
+
+  // =========================
+  // TEST ROUTE
+  // =========================
+
+  if (req.method === "GET" && req.url === "/") {
+    sendJson(res, 200, {
+      message: "The Shakes Reign Backend is running!",
     });
 
     return;
   }
 
-  // Route not found
-  res.statusCode = 404;
+  // =========================
+  // GET ORDERS
+  // =========================
 
-  res.end(
-    JSON.stringify({
-      message: "Route not found",
-    })
+  if (req.method === "GET" && req.url === "/orders") {
+    const orders = readJsonFile(ORDERS_FILE);
+
+    sendJson(res, 200, orders);
+    return;
+  }
+
+  // =========================
+  // CREATE ORDER
+  // =========================
+
+  if (req.method === "POST" && req.url === "/orders") {
+    try {
+      const order = await getBody(req);
+
+      const orders = readJsonFile(ORDERS_FILE);
+
+      const newOrder = {
+        id: Date.now(),
+        ...order,
+        createdAt: new Date().toISOString(),
+      };
+
+      orders.push(newOrder);
+
+      writeJsonFile(ORDERS_FILE, orders);
+
+      sendJson(res, 201, {
+        message: "Order received successfully!",
+        order: newOrder,
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      sendJson(res, 400, {
+        message: "Invalid order data",
+      });
+
+      return;
+    }
+  }
+
+  // =========================
+  // GET MENU
+  // =========================
+
+  if (req.method === "GET" && req.url === "/menu") {
+    const menu = readJsonFile(MENU_FILE);
+
+    sendJson(res, 200, menu);
+    return;
+  }
+
+  // =========================
+  // ADD DISH
+  // =========================
+if (req.method === "POST" && req.url === "/menu/category") {
+  try {
+    const data = await getBody(req);
+    const categoryName = String(data.category || "").trim();
+
+    if (!categoryName) {
+      sendJson(res, 400, {
+        message: "Category name is required",
+      });
+      return;
+    }
+
+    const menu = readJsonFile(MENU_FILE);
+
+    const alreadyExists = menu.some(
+      (item) =>
+        item.category.toLowerCase() === categoryName.toLowerCase()
+    );
+
+    if (alreadyExists) {
+      sendJson(res, 400, {
+        message: "Category already exists",
+      });
+      return;
+    }
+
+    menu.push({
+      category: categoryName,
+      items: [],
+    });
+
+    writeJsonFile(MENU_FILE, menu);
+
+    sendJson(res, 201, {
+      message: "Category added successfully!",
+      category: categoryName,
+    });
+
+    return;
+  } catch (error) {
+    console.error(error);
+
+    sendJson(res, 400, {
+      message: "Could not add category",
+    });
+
+    return;
+  }
+}
+  if (req.method === "POST" && req.url === "/menu") {
+    try {
+      const dish = await getBody(req);
+
+      const menu = readJsonFile(MENU_FILE);
+
+      const category = dish.category || "Other";
+
+      let categoryData = menu.find(
+        (item) => item.category === category
+      );
+
+      if (!categoryData) {
+        categoryData = {
+          category,
+          items: [],
+        };
+
+        menu.push(categoryData);
+      }
+
+      const newDish = {
+        name: dish.name,
+        price: Number(dish.price),
+        image: dish.image || "",
+        available:
+          dish.available !== undefined
+            ? Boolean(dish.available)
+            : true,
+        id:
+          dish.id ||
+          `${category
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`,
+      };
+
+      categoryData.items.push(newDish);
+
+      writeJsonFile(MENU_FILE, menu);
+
+      sendJson(res, 201, {
+        message: "Dish added successfully!",
+        item: newDish,
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      sendJson(res, 400, {
+        message: "Invalid dish data",
+      });
+
+      return;
+    }
+  }
+
+  // =========================
+  // UPDATE / EDIT DISH
+  // =========================
+
+  const menuItemMatch = req.url.match(
+  /^\/menu\/([^/]+)$/
+);
+
+  if (
+    menuItemMatch &&
+    (req.method === "PUT" ||
+      req.method === "PATCH")
+  ) {
+    try {
+      const itemId = decodeURIComponent(
+        menuItemMatch[1]
+      );
+
+      const updates = await getBody(req);
+
+      const menu = readJsonFile(MENU_FILE);
+
+      let foundItem = null;
+
+      for (const category of menu) {
+        const item = category.items.find(
+          (dish) => dish.id === itemId
+        );
+
+        if (item) {
+          Object.assign(item, {
+            ...updates,
+            price:
+              updates.price !== undefined
+                ? Number(updates.price)
+                : item.price,
+          });
+
+          foundItem = item;
+          break;
+        }
+      }
+
+      if (!foundItem) {
+        sendJson(res, 404, {
+          message: "Dish not found",
+        });
+
+        return;
+      }
+
+      writeJsonFile(MENU_FILE, menu);
+
+      sendJson(res, 200, {
+        message: "Dish updated successfully!",
+        item: foundItem,
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      sendJson(res, 400, {
+        message: "Invalid dish data",
+      });
+
+      return;
+    }
+  }
+
+  // =========================
+  // TOGGLE AVAILABLE / OUT OF STOCK
+  // =========================
+
+  const toggleMatch = req.url.match(
+    /^\/menu\/(.+)\/toggle$/
   );
+
+  if (
+    toggleMatch &&
+    req.method === "PATCH"
+  ) {
+    try {
+      const itemId = decodeURIComponent(
+        toggleMatch[1]
+      );
+
+      const menu = readJsonFile(MENU_FILE);
+
+      let foundItem = null;
+
+      for (const category of menu) {
+        const item = category.items.find(
+          (dish) => dish.id === itemId
+        );
+
+        if (item) {
+          item.available = !item.available;
+          foundItem = item;
+          break;
+        }
+      }
+
+      if (!foundItem) {
+        sendJson(res, 404, {
+          message: "Dish not found",
+        });
+
+        return;
+      }
+
+      writeJsonFile(MENU_FILE, menu);
+
+      sendJson(res, 200, {
+        message: foundItem.available
+          ? "Dish is now available"
+          : "Dish marked out of stock",
+        item: foundItem,
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      sendJson(res, 400, {
+        message: "Could not update availability",
+      });
+
+      return;
+    }
+  }
+
+  // =========================
+  // DELETE DISH
+  // =========================
+
+  if (
+    menuItemMatch &&
+    req.method === "DELETE"
+  ) {
+    try {
+      const itemId = decodeURIComponent(
+        menuItemMatch[1]
+      );
+
+      const menu = readJsonFile(MENU_FILE);
+
+      let deletedItem = null;
+
+      for (const category of menu) {
+        const index = category.items.findIndex(
+          (dish) => dish.id === itemId
+        );
+
+        if (index !== -1) {
+          deletedItem =
+            category.items.splice(index, 1)[0];
+          break;
+        }
+      }
+
+      if (!deletedItem) {
+        sendJson(res, 404, {
+          message: "Dish not found",
+        });
+
+        return;
+      }
+
+      writeJsonFile(MENU_FILE, menu);
+
+      sendJson(res, 200, {
+        message: "Dish deleted successfully!",
+        item: deletedItem,
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      sendJson(res, 400, {
+        message: "Could not delete dish",
+      });
+
+      return;
+    }
+  }
+
+  // =========================
+  // ROUTE NOT FOUND
+  // =========================
+
+  sendJson(res, 404, {
+    message: "Route not found",
+  });
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Backend running at http://localhost:${PORT}`);
+  console.log(
+    `Backend running at http://localhost:${PORT}`
+  );
 });

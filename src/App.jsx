@@ -1,6 +1,6 @@
-import logo from "./assets/logo.jpg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
+const API = "http://localhost:5000";
 import Admin from "./admin/Admin";
 import {
   BrowserRouter,
@@ -10,8 +10,22 @@ import {
 
 function App() {
   const [cart, setCart] = useState([]);
+  const [backendMenu, setBackendMenu] = useState(null);
 
-  const menuItems = [
+useEffect(() => {
+  fetch(`${API}/menu`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (Array.isArray(data)) {
+        setBackendMenu(data);
+      }
+    })
+    .catch((error) => {
+      console.error("Menu loading error:", error);
+    });
+}, []);
+
+  const initialMenuItems = [
   {
     category: "Shakes & Lassi",
     items: [
@@ -126,6 +140,36 @@ function App() {
     ],
   },
 ];
+
+  const [menuItems, setMenuItems] = useState(
+    initialMenuItems.map((section) => ({
+      ...section,
+      items: section.items.map((item) => ({
+        name: item[0],
+        price: item[1],
+        image: item[2],
+        available: true,
+      })),
+    }))
+  );
+
+  useEffect(() => {
+    fetch("https://the-shakes-reign.onrender.com/menu")
+      .then((res) => {
+        if (!res.ok) throw new Error("Menu could not be loaded");
+        return res.json();
+      })
+      .then((data) =>
+  setMenuItems(
+    data.map((section) => ({
+      ...section,
+      items: section.items.filter((item) => item.available !== false),
+    }))
+  )
+)
+      .catch((error) => console.error("Menu load error:", error));
+  }, []);
+
   const addToCart = (item) => {
     const existingIndex = cart.findIndex(
       (cartItem) => cartItem[0] === item[0]
@@ -353,14 +397,14 @@ function App() {
 
                           <div
                             className="menu-card"
-                            key={`${item[0]}-${index}`}
+                            key={`${item.name}-${index}`}
                           >
 
                             <div className="menu-image">
 
                               <img
-                                src={item[2]}
-                                alt={item[0]}
+                                src={item.image}
+                                alt={item.name}
                                 loading="lazy"
                               />
 
@@ -369,23 +413,20 @@ function App() {
                             <div className="menu-card-content">
 
                               <h4>
-                                {item[0]}
+                                {item.name}
                               </h4>
 
                               <div className="menu-bottom">
 
                                 <span className="menu-price">
-                                  ₹{item[1]}
+                                  ₹{item.price}
                                 </span>
 
                                 <button
                                   className="add-btn"
-                                  onClick={() =>
-                                    addToCart(item)
-                                  }
-                                >
-                                  + Add
-                                </button>
+                                  disabled={item.available === false}
+                                  onClick={() => addToCart([item.name, item.price, item.image])}
+                                >{item.available === false ? "Out of Stock" : "+ Add"}</button>
 
                               </div>
 

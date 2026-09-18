@@ -1,0 +1,479 @@
+[
+  {
+    "category": "Shakes & Lassi",
+    "items": [
+      {
+        "name": "Royal Dry Fruit Lassi",
+        "price": 99,
+        "image": "https://b.zmtcdn.com/data/dish_photos/d6a/24e0af3412e4fd8cd33a4c0f41018d6a.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-1"
+      },
+      {
+        "name": "Paan Lassi",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/099/3d31059de05d528b2359ef57c8b55099.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-2"
+      },
+      {
+        "name": "Gulab Lassi",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/c31/9fec07f3fd69a97e9ed7d57aef804c31.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-3"
+      },
+      {
+        "name": "Amritsar Style Lassi",
+        "price": 79,
+        "image": "https://b.zmtcdn.com/data/dish_photos/889/322f9478698c738a8a08f8e782ca6889.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-4"
+      },
+      {
+        "name": "Mango Lassi",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/697/86473f50aba0a20865df9564c09a7697.jpeg",
+        "available": true,
+        "id": "shakes-&-lassi-5"
+      },
+      {
+        "name": "Strawberry Lassi",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/71d/ddf92f82669d5d0136a56887a784d71d.jpeg",
+        "available": true,
+        "id": "shakes-&-lassi-6"
+      },
+      {
+        "name": "KitKat Chocolate Thickshake",
+        "price": 129,
+        "image": "https://b.zmtcdn.com/data/dish_photos/b45/880ff1dd34759025705197d1d729eb45.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-7"
+      },
+      {
+        "name": "Creamy Vanilla Thickshake",
+        "price": 109,
+        "image": "https://b.zmtcdn.com/data/dish_photos/a3d/a9a69c6a0f3f0765431ea0a630d4aa3d.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-8"
+      },
+      {
+        "name": "Butterscotch Shake With Ice Cream",
+        "price": 109,
+        "image": "https://b.zmtcdn.com/data/dish_photos/5d9/f259e989a34a220dbe83f316132bf5d9.jpeg",
+        "available": true,
+        "id": "shakes-&-lassi-9"
+      },
+      {
+        "name": "Strawberry Shake With Ice Cream",
+        "price": 109,
+        "image": "https://b.zmtcdn.com/data/dish_photos/0fc/56f1ab40b68742a79150970f912bd0fc.jpeg",
+        "available": true,
+        "id": "shakes-&-lassi-10"
+      },
+      {
+        "name": "Oreo Overload Thickshake",
+        "price": 129,
+        "image": "https://b.zmtcdn.com/data/dish_photos/601/936baf2fb2301e853e080ada792dd601.jpg",
+        "available": true,
+        "id": "shakes-&-lassi-11"
+      },
+      {
+        "name": "Cafe Style Cold Coffee",
+        "price": 149,
+        "image": "https://b.zmtcdn.com/data/dish_photos/ac4/57997d5e6a46197e70a55ec5bb8e2ac4.png",
+        "available": true,
+        "id": "shakes-&-lassi-12"
+      },
+      {
+        "name": "Creamy Badam Shake",
+        "price": 99,
+        "image": "https://b.zmtcdn.com/data/dish_photos/d1d/68b684c058050b859eb835d47a37dd1d.jpeg",
+        "available": true,
+        "id": "shakes-&-lassi-13"
+      }
+    ]
+  },
+  {
+    "category": "Pasta",
+    "items": [
+      {
+        "name": "Cheesy Masala Macaroni",
+        "price": 239,
+        "image": "https://b.zmtcdn.com/data/dish_photos/9b4/d41d4926a561aa61de37ddd40f6809b4.jpeg",
+        "available": true,
+        "id": "pasta-1"
+      },
+      {
+        "name": "Italian White Sauce Pasta",
+        "price": 219,
+        "image": "https://b.zmtcdn.com/data/dish_photos/bc3/642a86c45314d5f7336006f121c41bc3.jpeg",
+        "available": true,
+        "id": "pasta-2"
+      },
+      {
+        "name": "Red Sauce Macaroni Pasta",
+        "price": 229,
+        "image": "https://b.zmtcdn.com/data/dish_photos/edb/186a5150c55e780311f1675a02b03edb.jpeg",
+        "available": true,
+        "id": "pasta-3"
+      },
+      {
+        "name": "Peri Peri Macaroni",
+        "price": 239,
+        "image": "https://b.zmtcdn.com/data/dish_photos/5a4/753c67554cd7c633daf8260913e835a4.jpeg",
+        "available": true,
+        "id": "pasta-4"
+      }
+    ]
+  },
+  {
+    "category": "Snacks",
+    "items": [
+      {
+        "name": "Paneer Pop Roll",
+        "price": 139,
+        "image": "https://b.zmtcdn.com/data/dish_photos/5fd/8050467d6e5ae69977076b3ee4d645fd.jpg",
+        "available": true,
+        "id": "snacks-1"
+      },
+      {
+        "name": "Cheesy Paneer Roll",
+        "price": 199,
+        "image": "https://b.zmtcdn.com/data/dish_photos/a35/999397529332a50488fe7fe7c04d2a35.png",
+        "available": true,
+        "id": "snacks-2"
+      },
+      {
+        "name": "Soya Protein Roll",
+        "price": 128,
+        "image": "https://b.zmtcdn.com/data/dish_photos/5cf/d0683031c102fb8a95e0cff8baccb5cf.jpeg",
+        "available": true,
+        "id": "snacks-3"
+      },
+      {
+        "name": "Street Style Schezwan Poha",
+        "price": 99,
+        "image": "https://b.zmtcdn.com/data/dish_photos/486/9ee1bbc9ce869c7c20ea92c3d07bf486.jpeg",
+        "available": true,
+        "id": "snacks-4"
+      },
+      {
+        "name": "Classic Indori Poha",
+        "price": 119,
+        "image": "https://b.zmtcdn.com/data/dish_photos/1ca/feccd44a8c6f757e23b2763fcd36f1ca.jpeg",
+        "available": true,
+        "id": "snacks-5"
+      }
+    ]
+  },
+  {
+    "category": "Sandwiches",
+    "items": [
+      {
+        "name": "Smoky Tandoori Paneer Sandwich",
+        "price": 229,
+        "image": "https://b.zmtcdn.com/data/dish_photos/b36/ca5d6a0b5fc4e91729b70f16f7942b36.jpeg",
+        "available": true,
+        "id": "sandwiches-1"
+      },
+      {
+        "name": "3 Layered Cheese Sandwich",
+        "price": 169,
+        "image": "https://b.zmtcdn.com/data/dish_photos/2e4/cec3a93915d83dad0b0d6329cd1b42e4.jpg",
+        "available": true,
+        "id": "sandwiches-2"
+      },
+      {
+        "name": "Mac And Cheese Sandwich",
+        "price": 119,
+        "image": "https://b.zmtcdn.com/data/dish_photos/867/0b45da62df721c644eb324aa5fe7f867.jpeg",
+        "available": true,
+        "id": "sandwiches-3"
+      },
+      {
+        "name": "Veg Grilled Sandwich",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/b9d/47fa1f14f672831863664193012b0b9d.png",
+        "available": true,
+        "id": "sandwiches-4"
+      },
+      {
+        "name": "Mac n Malai Sandwich",
+        "price": 99,
+        "image": "https://b.zmtcdn.com/data/dish_photos/712/caf0efd00b5727d0f0a6a0455cdb1712.jpeg",
+        "available": true,
+        "id": "sandwiches-5"
+      },
+      {
+        "name": "Cheese-e-Corn Sandwich",
+        "price": 128,
+        "image": "https://b.zmtcdn.com/data/dish_photos/2bb/410dad886eb7ed1428b75a581d71b2bb.png",
+        "available": true,
+        "id": "sandwiches-6"
+      },
+      {
+        "name": "Masala Aloo Sandwich",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/682/5d3a29bfac895df6b7168357b1db0682.jpeg",
+        "available": true,
+        "id": "sandwiches-7"
+      }
+    ]
+  },
+  {
+    "category": "Noodles & Maggi",
+    "items": [
+      {
+        "name": "Paneer Hakka Noodles",
+        "price": 145,
+        "image": "https://b.zmtcdn.com/data/dish_photos/295/6ebbe68b3b3ebe3ce2694710c3e42295.jpeg",
+        "available": true,
+        "id": "noodles-&-maggi-1"
+      },
+      {
+        "name": "Street Style Chilli Garlic Noodles",
+        "price": 128,
+        "image": "https://b.zmtcdn.com/data/dish_photos/de2/b6bdb7610f5875e7fbef7368034fade2.jpg",
+        "available": true,
+        "id": "noodles-&-maggi-2"
+      },
+      {
+        "name": "Punjabi Butter Tadka Maggi",
+        "price": 159,
+        "image": "https://b.zmtcdn.com/data/dish_photos/909/c143fa6ae22689a6d34d1a76e009d909.jpg",
+        "available": true,
+        "id": "noodles-&-maggi-3"
+      },
+      {
+        "name": "Spicy Korean Style Maggi",
+        "price": 139,
+        "image": "https://b.zmtcdn.com/data/dish_photos/e9f/5453cc1e21467286418a1b2a56cc8e9f.jpeg",
+        "available": true,
+        "id": "noodles-&-maggi-4"
+      },
+      {
+        "name": "Cheesy Chilli Maggi",
+        "price": 169,
+        "image": "https://b.zmtcdn.com/data/dish_photos/c6d/61cefa97e5b97becadcad99495e27c6d.jpeg",
+        "available": true,
+        "id": "noodles-&-maggi-5"
+      },
+      {
+        "name": "Veg Double Masala Maggi",
+        "price": 119,
+        "image": "https://b.zmtcdn.com/data/dish_photos/26c/20d56b81be6d9e6585baaf87be07826c.jpg",
+        "available": true,
+        "id": "noodles-&-maggi-6"
+      },
+      {
+        "name": "Pahadi Style Maggi",
+        "price": 199,
+        "image": "https://b.zmtcdn.com/data/dish_photos/fbc/c43ecbfd129c8374d23fd3f642de7fbc.jpeg",
+        "available": true,
+        "id": "noodles-&-maggi-7"
+      }
+    ]
+  },
+  {
+    "category": "Homemade Food",
+    "items": [
+      {
+        "name": "Schezwan Fried Rice",
+        "price": 109,
+        "image": "https://b.zmtcdn.com/data/dish_photos/70b/1478675c511a0b075fc9e15ba084070b.jpeg",
+        "available": true,
+        "id": "homemade-food-1"
+      },
+      {
+        "name": "Extra Poori",
+        "price": 18,
+        "image": "https://b.zmtcdn.com/data/dish_photos/aa0/64d52ed27ef295890e38acc92f83daa0.jpg",
+        "available": true,
+        "id": "homemade-food-2"
+      },
+      {
+        "name": "Ajwain Paratha",
+        "price": 28,
+        "image": "https://b.zmtcdn.com/data/dish_photos/2a5/92ff1856959e068fbfeeb33010e262a5.jpeg",
+        "available": true,
+        "id": "homemade-food-3"
+      },
+      {
+        "name": "Soft Tawa Roti",
+        "price": 18,
+        "image": "https://b.zmtcdn.com/data/dish_photos/340/11115d45e2153a56b60aa23f4d3f3340.jpeg",
+        "available": true,
+        "id": "homemade-food-4"
+      },
+      {
+        "name": "Soft Ghee Roti",
+        "price": 25,
+        "image": "https://b.zmtcdn.com/data/dish_photos/e3c/5ddbeda6ded3ab179dd8a8b3855afe3c.jpeg",
+        "available": true,
+        "id": "homemade-food-5"
+      },
+      {
+        "name": "Desi Aloo Jeera",
+        "price": 89,
+        "image": "https://b.zmtcdn.com/data/dish_photos/7a4/a21623c56a59ede38e2b914c15e077a4.jpeg",
+        "available": true,
+        "id": "homemade-food-6"
+      },
+      {
+        "name": "Dhaba Style Paneer Bhurji",
+        "price": 249,
+        "image": "https://b.zmtcdn.com/data/dish_photos/68b/e6b5c385a8f09e760e5da64a9dc7a68b.jpg",
+        "available": true,
+        "id": "homemade-food-7"
+      },
+      {
+        "name": "8 Poori with Aloo Sabzi",
+        "price": 168,
+        "image": "https://b.zmtcdn.com/data/dish_photos/bb5/bee3f6bd9761435185a26238a6c81bb5.jpeg",
+        "available": true,
+        "id": "homemade-food-8"
+      },
+      {
+        "name": "2 Jumbo Aloo Paratha + Imli Chutney",
+        "price": 179,
+        "image": "https://b.zmtcdn.com/data/dish_photos/43c/e732c28c415ccc3400f73e9dad79d43c.jpeg",
+        "available": true,
+        "id": "homemade-food-9"
+      },
+      {
+        "name": "2 Jumbo Aloo Paratha + Imli Chutney",
+        "price": 149,
+        "image": "https://b.zmtcdn.com/data/dish_photos/43c/e732c28c415ccc3400f73e9dad79d43c.jpeg",
+        "available": true,
+        "id": "homemade-food-10"
+      },
+      {
+        "name": "2 Pyaaj Paratha + Green Chutney",
+        "price": 109,
+        "image": "https://b.zmtcdn.com/data/dish_photos/309/4841a67eb16475c47eccee92477b8309.jpeg",
+        "available": true,
+        "id": "homemade-food-11"
+      },
+      {
+        "name": "6 Poori with Aloo Jeera and Dahi",
+        "price": 149,
+        "image": "https://b.zmtcdn.com/data/dish_photos/51f/3feaf95cb01d8fef0a7494eee171a51f.png",
+        "available": true,
+        "id": "homemade-food-12"
+      },
+      {
+        "name": "8 Meethi Poori with Aloo Jeera & Curd",
+        "price": 158,
+        "image": "https://b.zmtcdn.com/data/dish_photos/2cf/3b8ecfa4005d4acee8ccddec8a7a02cf.jpeg",
+        "available": true,
+        "id": "homemade-food-13"
+      },
+      {
+        "name": "Desi Ghee Meethi Pua with Aloo Jeera & Curd",
+        "price": 229,
+        "image": "https://b.zmtcdn.com/data/dish_photos/745/2574589d3626ac8013a9c749147ed745.jpg",
+        "available": true,
+        "id": "homemade-food-14"
+      },
+      {
+        "name": "2 Paneer Pyaaz Paratha + Green Chutney",
+        "price": 199,
+        "image": "https://b.zmtcdn.com/data/dish_photos/8a7/cdbd30ee9e6e4dfacfb24544b655a8a7.jpeg",
+        "available": true,
+        "id": "homemade-food-15"
+      },
+      {
+        "name": "8 Kasturi Methi Kachori with Aloo Jeera & Boondi Raita",
+        "price": 179,
+        "image": "https://b.zmtcdn.com/data/dish_photos/76f/a706bf7c5df3f0165e7411349370876f.jpeg",
+        "available": true,
+        "id": "homemade-food-16"
+      },
+      {
+        "name": "6 Aloo Kachori with Dahi & Imli Chutney",
+        "price": 198,
+        "image": "https://b.zmtcdn.com/data/dish_photos/63f/b365574aa3f6d5615ebaa5535a1ba63f.jpeg",
+        "available": true,
+        "id": "homemade-food-17"
+      },
+      {
+        "name": "North Indian Roti Thali",
+        "price": 145,
+        "image": "https://b.zmtcdn.com/data/dish_photos/6ac/44a5274d9ecb75e2407731934fecd6ac.jpeg",
+        "available": true,
+        "id": "homemade-food-18"
+      }
+    ]
+  },
+  {
+    "category": "Desserts",
+    "items": [
+      {
+        "name": "Elaichi Sabudana Kheer",
+        "price": 229,
+        "image": "https://b.zmtcdn.com/data/dish_photos/832/b276794d05afc6b7383d5d71a6630832.jpeg",
+        "available": true,
+        "id": "desserts-1"
+      },
+      {
+        "name": "Sabudana Khichdi",
+        "price": 199,
+        "image": "https://b.zmtcdn.com/data/dish_photos/bf6/2721d6835f574ad6d8a3f162f93dabf6.jpeg",
+        "available": true,
+        "id": "desserts-2"
+      },
+      {
+        "name": "Desi Ghee Suji Halwa",
+        "price": 289,
+        "image": "https://b.zmtcdn.com/data/dish_photos/559/ca513d5c741e76eb7295b891a3ba9559.jpeg",
+        "available": true,
+        "id": "desserts-3"
+      }
+    ]
+  },
+  {
+    "category": "Pizza & Combos",
+    "items": [
+      {
+        "name": "Cheesy Veg Kullad Pizza (200 ml)",
+        "price": 119,
+        "image": "https://b.zmtcdn.com/data/dish_photos/671/02a3b93c24f2a19b0421c4ef7d574671.jpeg",
+        "available": true,
+        "id": "pizza-&-combos-1"
+      },
+      {
+        "name": "Chilli Paneer + Fried Rice",
+        "price": 388,
+        "image": "https://b.zmtcdn.com/data/dish_photos/981/dd9b20c3926de09ff293ed26b4b57981.jpeg",
+        "available": true,
+        "id": "pizza-&-combos-2"
+      }
+    ]
+  },
+  {
+    "category": "Chutney & Dips",
+    "items": [
+      {
+        "name": "Gud Imli Chutney",
+        "price": 27,
+        "image": "https://b.zmtcdn.com/data/dish_photos/ed7/1c4f200b4ad333a1996dc90436d4ced7.jpeg",
+        "available": true,
+        "id": "chutney-&-dips-1"
+      }
+    ]
+  },
+  {
+    "category": "Special combos",
+    "items": [
+      {
+        "name": "manchuria and fried rice",
+        "price": 399,
+        "image": "",
+        "available": true,
+        "id": "special-combos-1789719357307"
+      }
+    ]
+  }
+]
