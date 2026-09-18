@@ -1,6 +1,12 @@
 import http from "http";
 import fs from "fs";
-
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+dotenv.config({ path: "./src/backend/.env" });
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 const PORT = process.env.PORT || 5000;
 
 const ORDERS_FILE = "./src/backend/order.json";
@@ -143,54 +149,89 @@ const server = http.createServer(async (req, res) => {
   }
 
   // =========================
-  // GET ORDERS
-  // =========================
+// GET ORDERS
+// =========================
 
-  if (req.method === "GET" && req.url === "/orders") {
-    const orders = readJsonFile(ORDERS_FILE);
+if (req.method === "GET" && req.url === "/orders") {
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-    sendJson(res, 200, orders);
+    if (error) {
+      console.error("Supabase orders error:", error);
+
+      sendJson(res, 500, {
+        message: "Could not load orders",
+      });
+
+      return;
+    }
+
+    sendJson(res, 200, data);
+
+    return;
+  } catch (error) {
+    console.error("Orders error:", error);
+
+    sendJson(res, 500, {
+      message: "Could not load orders",
+    });
 
     return;
   }
-
+}
   // =========================
   // CREATE ORDER
   // =========================
 
   if (req.method === "POST" && req.url === "/orders") {
-    try {
-      const order = await getBody(req);
+  try {
+    const order = await getBody(req);
 
-      const orders = readJsonFile(ORDERS_FILE);
+    const { data, error } = await supabase
+      .from("orders")
+      .insert([
+        {
+          customer_name:
+            order.customerName || order.customer_name || "",
+          phone: order.phone || "",
+          address: order.address || "",
+          items: order,
+          total: Number(order.total) || 0,
+          status: "pending",
+        },
+      ])
+      .select()
+      .single();
 
-      const newOrder = {
-        id: Date.now(),
-        ...order,
-        createdAt: new Date().toISOString(),
-      };
+    if (error) {
+      console.error("Supabase order error:", error);
 
-      orders.push(newOrder);
-
-      writeJsonFile(ORDERS_FILE, orders);
-
-      sendJson(res, 201, {
-        message: "Order received successfully!",
-        order: newOrder,
-      });
-
-      return;
-    } catch (error) {
-      console.error(error);
-
-      sendJson(res, 400, {
-        message: "Invalid order data",
+      sendJson(res, 500, {
+        message: "Could not save order",
       });
 
       return;
     }
-  }
 
+    sendJson(res, 201, {
+      message: "Order received successfully!",
+      order: data,
+    });
+
+    return;
+  } catch (error) {
+    console.error("Order error:", error);
+
+    sendJson(res, 400, {
+      message: "Invalid order data",
+    });
+
+    return;
+  }
+}
   // =========================
   // GET MENU
   // =========================
