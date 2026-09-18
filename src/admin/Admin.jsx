@@ -43,27 +43,33 @@ function Admin() {
   // =========================
 
   const loadMenu = async () => {
+  try {
     setLoadingMenu(true);
 
-    try {
-      const response = await fetch(`${API}/menu`);
-      const data = await response.json();
+    const response = await fetch(
+      "https://the-shakes-reign.onrender.com/menu"
+    );
 
-      const menuData = Array.isArray(data)
-        ? data
-        : Array.isArray(data.value)
-        ? data.value
-        : [];
-
-      setMenu(menuData);
-    } catch (error) {
-      console.error("Menu error:", error);
-      setMenu([]);
-    } finally {
-      setLoadingMenu(false);
+    if (!response.ok) {
+      throw new Error(`Menu API error: ${response.status}`);
     }
-  };
 
+    const data = await response.json();
+
+    console.log("LIVE MENU DATA:", data);
+
+    if (!Array.isArray(data)) {
+      throw new Error("Menu data is not an array");
+    }
+
+    setMenu(data);
+  } catch (error) {
+    console.error("Menu loading error:", error);
+    setMenu([]);
+  } finally {
+    setLoadingMenu(false);
+  }
+};
   // =========================
   // LOAD DATA
   // =========================
