@@ -991,3 +991,73 @@ footer p:last-child {
   background: #999;
 }
 
+/* =========================
+   CART POPUP
+========================= */
+
+.cart-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.cart-popup-box {
+  width: 100%;
+  max-width: 430px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #fffaf2;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.cart-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.cart-popup-header h2 {
+  margin: 0;
+  color: #b11226;
+}
+
+.cart-popup-header button {
+  border: none;
+  background: #b11226;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.cart-popup-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-popup-item strong {
+  color: #222;
+}
+
+.cart-popup-item p {
+  margin: 5px 0 0;
+  color: #666;
+}
+
+.cart-popup-total {
+  margin: 18px 0;
+  color: #b11226;
+}

@@ -10,6 +10,7 @@ import {
 
 function App() {
   const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
   const [backendMenu, setBackendMenu] = useState(null);
 
 useEffect(() => {
@@ -171,27 +172,30 @@ useEffect(() => {
   }, []);
 
   const addToCart = (item) => {
-    const existingIndex = cart.findIndex(
-      (cartItem) => cartItem[0] === item[0]
-    );
+  const existingIndex = cart.findIndex(
+    (cartItem) => cartItem[0] === item[0]
+  );
 
-    if (existingIndex !== -1) {
-      setCart(
-        cart.map((cartItem, index) =>
-          index === existingIndex
-            ? [
-                cartItem[0],
-                cartItem[1],
-                cartItem[2],
-                (cartItem[3] || 1) + 1,
-              ]
-            : cartItem
-        )
-      );
-    } else {
-      setCart([...cart, [...item, 1]]);
-    }
-  };
+  if (existingIndex !== -1) {
+    setCart(
+      cart.map((cartItem, index) =>
+        index === existingIndex
+          ? [
+              cartItem[0],
+              cartItem[1],
+              cartItem[2],
+              (cartItem[3] || 1) + 1,
+            ]
+          : cartItem
+      )
+    );
+  } else {
+    setCart([...cart, [...item, 1]]);
+  }
+
+  // Open cart immediately after adding
+  setCartOpen(true);
+};
 
   const orderOnWhatsApp = async () => {
     if (cart.length === 0) {
@@ -507,7 +511,70 @@ useEffect(() => {
               </section>
 
               {/* CART */}
+              {cartOpen && (
+  <div className="cart-popup">
+    <div className="cart-popup-box">
+      <div className="cart-popup-header">
+        <h2>Your Cart</h2>
+        <button onClick={() => setCartOpen(false)}>✕</button>
+      </div>
+
+      {cart.map((item, index) => (
+        <div className="cart-popup-item" key={index}>
+          <div>
+            <strong>{item[0]}</strong>
+            <p>₹{item[1]} × {item[3] || 1}</p>
+          </div>
+
+          <div className="cart-qty">
+            <button
+              onClick={() => {
+                if ((item[3] || 1) > 1) {
+                  setCart(
+                    cart.map((cartItem, i) =>
+                      i === index
+                        ? [...cartItem.slice(0, 3), (cartItem[3] || 1) - 1]
+                        : cartItem
+                    )
+                  );
+                }
+              }}
+            >
+              −
+            </button>
+
+            <span>{item[3] || 1}</span>
+
+            <button
+              onClick={() => {
+                setCart(
+                  cart.map((cartItem, i) =>
+                    i === index
+                      ? [...cartItem.slice(0, 3), (cartItem[3] || 1) + 1]
+                      : cartItem
+                  )
+                );
+              }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      ))}
+
+      <h3 className="cart-popup-total">Total: ₹{total}</h3>
+
+      <button
+        className="whatsapp-order-btn"
+        onClick={orderOnWhatsApp}
+      >
+        💬 Order on WhatsApp
+      </button>
+    </div>
+  </div>
+)}
               <section className="cart-section">
+
 
                 <p className="section-tag">
                   YOUR CART
