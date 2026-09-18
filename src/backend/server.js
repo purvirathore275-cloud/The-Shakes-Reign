@@ -5,6 +5,11 @@ const PORT = process.env.PORT || 5000;
 
 const ORDERS_FILE = "./src/backend/order.json";
 const MENU_FILE = "./src/backend/menu.json";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// =========================
+// READ JSON FILE
+// =========================
 
 function readJsonFile(file) {
   try {
@@ -25,15 +30,27 @@ function readJsonFile(file) {
   }
 }
 
+// =========================
+// WRITE JSON FILE
+// =========================
+
 function writeJsonFile(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
+
+// =========================
+// SEND JSON
+// =========================
 
 function sendJson(res, statusCode, data) {
   res.statusCode = statusCode;
   res.setHeader("Content-Type", "application/json");
   res.end(JSON.stringify(data));
 }
+
+// =========================
+// GET REQUEST BODY
+// =========================
 
 function getBody(req) {
   return new Promise((resolve, reject) => {
@@ -55,19 +72,29 @@ function getBody(req) {
   });
 }
 
+// =========================
+// CREATE SERVER
+// =========================
+
 const server = http.createServer(async (req, res) => {
   res.setHeader("Content-Type", "application/json");
+
   res.setHeader("Access-Control-Allow-Origin", "*");
+
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, PATCH, DELETE, OPTIONS"
   );
+
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type"
   );
 
+  // =========================
   // CORS
+  // =========================
+
   if (req.method === "OPTIONS") {
     res.statusCode = 200;
     res.end();
@@ -87,6 +114,35 @@ const server = http.createServer(async (req, res) => {
   }
 
   // =========================
+  // ADMIN LOGIN
+  // =========================
+
+  if (req.method === "POST" && req.url === "/admin-login") {
+    try {
+      const body = await getBody(req);
+
+      if (!body || body.password !== ADMIN_PASSWORD) {
+        return sendJson(res, 401, {
+          success: false,
+          message: "Invalid password",
+        });
+      }
+
+      return sendJson(res, 200, {
+        success: true,
+        message: "Admin login successful",
+      });
+    } catch (error) {
+      console.error("Admin login error:", error);
+
+      return sendJson(res, 500, {
+        success: false,
+        message: "Login failed",
+      });
+    }
+  }
+
+  // =========================
   // GET ORDERS
   // =========================
 
@@ -94,6 +150,7 @@ const server = http.createServer(async (req, res) => {
     const orders = readJsonFile(ORDERS_FILE);
 
     sendJson(res, 200, orders);
+
     return;
   }
 
@@ -138,68 +195,84 @@ const server = http.createServer(async (req, res) => {
   // GET MENU
   // =========================
 
-if (
-  req.method === "GET" &&
-  (req.url === "/menu" || req.url === "/menu/")
-) {
+  if (
+    req.method === "GET" &&
+    (req.url === "/menu" || req.url === "/menu/")
+  ) {
     const menu = readJsonFile(MENU_FILE);
 
     sendJson(res, 200, menu);
+
     return;
+  }
+
+  // =========================
+  // ADD CATEGORY
+  // =========================
+
+  if (
+    req.method === "POST" &&
+    req.url === "/menu/category"
+  ) {
+    try {
+      const data = await getBody(req);
+
+      const categoryName = String(
+        data.category || ""
+      ).trim();
+
+      if (!categoryName) {
+        sendJson(res, 400, {
+          message: "Category name is required",
+        });
+
+        return;
+      }
+
+      const menu = readJsonFile(MENU_FILE);
+
+      const alreadyExists = menu.some(
+        (item) =>
+          item.category.toLowerCase() ===
+          categoryName.toLowerCase()
+      );
+
+      if (alreadyExists) {
+        sendJson(res, 400, {
+          message: "Category already exists",
+        });
+
+        return;
+      }
+
+      menu.push({
+        category: categoryName,
+        items: [],
+      });
+
+      writeJsonFile(MENU_FILE, menu);
+
+      sendJson(res, 201, {
+        message: "Category added successfully!",
+        category: categoryName,
+      });
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      sendJson(res, 400, {
+        message: "Could not add category",
+      });
+
+      return;
+    }
   }
 
   // =========================
   // ADD DISH
   // =========================
-if (req.method === "POST" && req.url === "/menu/category") {
-  try {
-    const data = await getBody(req);
-    const categoryName = String(data.category || "").trim();
 
-    if (!categoryName) {
-      sendJson(res, 400, {
-        message: "Category name is required",
-      });
-      return;
-    }
-
-    const menu = readJsonFile(MENU_FILE);
-
-    const alreadyExists = menu.some(
-      (item) =>
-        item.category.toLowerCase() === categoryName.toLowerCase()
-    );
-
-    if (alreadyExists) {
-      sendJson(res, 400, {
-        message: "Category already exists",
-      });
-      return;
-    }
-
-    menu.push({
-      category: categoryName,
-      items: [],
-    });
-
-    writeJsonFile(MENU_FILE, menu);
-
-    sendJson(res, 201, {
-      message: "Category added successfully!",
-      category: categoryName,
-    });
-
-    return;
-  } catch (error) {
-    console.error(error);
-
-    sendJson(res, 400, {
-      message: "Could not add category",
-    });
-
-    return;
-  }
-}
   if (req.method === "POST" && req.url === "/menu") {
     try {
       const dish = await getBody(req);
@@ -262,8 +335,8 @@ if (req.method === "POST" && req.url === "/menu/category") {
   // =========================
 
   const menuItemMatch = req.url.match(
-  /^\/menu\/([^/]+)$/
-);
+    /^\/menu\/([^/]+)$/
+  );
 
   if (
     menuItemMatch &&
@@ -355,7 +428,9 @@ if (req.method === "POST" && req.url === "/menu/category") {
 
         if (item) {
           item.available = !item.available;
+
           foundItem = item;
+
           break;
         }
       }
@@ -414,6 +489,7 @@ if (req.method === "POST" && req.url === "/menu/category") {
         if (index !== -1) {
           deletedItem =
             category.items.splice(index, 1)[0];
+
           break;
         }
       }
@@ -453,6 +529,10 @@ if (req.method === "POST" && req.url === "/menu/category") {
     message: "Route not found",
   });
 });
+
+// =========================
+// START SERVER
+// =========================
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(

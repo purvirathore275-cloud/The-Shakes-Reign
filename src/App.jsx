@@ -1,3 +1,4 @@
+import AdminLogin from "./admin/AdminLogin";
 import { useEffect, useState } from "react";
 import "./App.css";
 import Admin from "./admin/Admin";
@@ -12,6 +13,7 @@ const API = "https://the-shakes-reign.onrender.com";
 
 function App() {
   const [cart, setCart] = useState([]);
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
   const [menuItems, setMenuItems] = useState([]);
@@ -768,9 +770,17 @@ function App() {
         />
 
         <Route
-          path="/admin"
-          element={<Admin />}
-        />
+  path="/admin"
+  element={
+    adminLoggedIn ? (
+      <Admin />
+    ) : (
+      <AdminLogin
+        onLogin={() => setAdminLoggedIn(true)}
+      />
+    )
+  }
+/>
 
       </Routes>
 

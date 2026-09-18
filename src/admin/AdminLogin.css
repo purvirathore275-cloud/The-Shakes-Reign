@@ -1,0 +1,73 @@
+.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #fffaf2;
+}
+
+.admin-login-box {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  padding: 36px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  border: 1px solid #eee;
+}
+
+.admin-login-box h1 {
+  margin: 0 0 8px;
+  color: #b11226;
+  font-size: 30px;
+}
+
+.admin-login-box p {
+  margin: 0 0 24px;
+  color: #555;
+  font-size: 18px;
+}
+
+.admin-login-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-login-box input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  font-size: 15px;
+}
+
+.admin-login-box input:focus {
+  border-color: #b11226;
+  box-shadow: 0 0 0 3px rgba(177, 18, 38, 0.1);
+}
+
+.admin-login-box button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: #b11226;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-login-box button:hover {
+  background: #8f0e1e;
+  transform: translateY(-1px);
+}
+
+.admin-login-box button:active {
+  transform: translateY(0);
+}
