@@ -37,6 +37,38 @@ function Admin() {
       setLoadingOrders(false);
     }
   };
+  // =========================
+// UPDATE ORDER STATUS
+// =========================
+
+const updateOrderStatus = async (orderId, status) => {
+  try {
+    const response = await fetch(
+      `${API}/orders/${encodeURIComponent(orderId)}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: status,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Could not update order status.");
+      return;
+    }
+
+    await loadOrders();
+  } catch (error) {
+    console.error("Status update error:", error);
+    alert("Backend connection failed.");
+  }
+};
 
   // =========================
   // LOAD MENU
@@ -380,17 +412,146 @@ const addCategory = async () => {
 
         {/* ================= TABS ================= */}
 
-        <div className="admin-tabs">
+<div className="admin-tabs">
 
-          <button className="admin-tab">
-            📦 Orders
-          </button>
+  <button className="admin-tab active">
+    📦 Orders
+  </button>
 
-          <button className="admin-tab active">
-            🍽️ Menu Management
-          </button>
+  <button className="admin-tab">
+    🍽️ Menu Management
+  </button>
+
+</div>
+{/* ================= ORDERS ================= */}
+
+<section className="orders-management">
+
+  <div className="orders-heading">
+    <div>
+      <h2>Customer Orders</h2>
+      <p>Manage incoming orders and update their status.</p>
+    </div>
+
+    <button
+      className="refresh-btn"
+      onClick={loadOrders}
+    >
+      ↻ Refresh Orders
+    </button>
+  </div>
+
+  {loadingOrders ? (
+    <div className="no-orders">
+      <div>⏳</div>
+      <h3>Loading orders...</h3>
+    </div>
+  ) : orders.length === 0 ? (
+    <div className="no-orders">
+      <div>📦</div>
+      <h3>No orders yet</h3>
+      <p>Customer orders will appear here.</p>
+    </div>
+  ) : (
+    <div className="orders-list">
+
+      {orders.map((order) => (
+
+        <div className="order-admin-card" key={order.id}>
+
+          <div className="order-admin-top">
+
+            <div>
+              <span className="order-id">
+                Order #{order.id}
+              </span>
+
+              <h3>
+                {order.customer_name || "Customer"}
+              </h3>
+
+              <p>
+                📞 {order.phone || "No phone"}
+              </p>
+
+              <p>
+                📍 {order.address || "No address"}
+              </p>
+            </div>
+
+            <div className="order-total">
+              ₹{order.total || 0}
+            </div>
+
+          </div>
+
+          {/* ORDER ITEMS */}
+
+          <div className="order-items">
+
+            <h4>Items</h4>
+
+            {Array.isArray(order.items) ? (
+              order.items.map((item, index) => (
+                <div
+                  className="order-item-row"
+                  key={index}
+                >
+                  <span>
+                    {item.name || "Item"}
+                  </span>
+
+                  <span>
+                    × {item.quantity || 1}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p>No item details available.</p>
+            )}
+
+          </div>
+
+          {/* STATUS */}
+
+          <div className="order-status-area">
+
+            <label>
+              Order Status
+            </label>
+
+            <select
+              value={order.status || "Pending"}
+              onChange={(e) =>
+                updateOrderStatus(
+                  order.id,
+                  e.target.value
+                )
+              }
+            >
+              <option value="Pending">
+                Pending
+              </option>
+
+              <option value="Preparing">
+                Preparing
+              </option>
+
+              <option value="Completed">
+                Completed
+              </option>
+            </select>
+
+          </div>
 
         </div>
+
+      ))}
+
+    </div>
+  )}
+
+</section>
 
         {/* ================= MENU ================= */}
 
