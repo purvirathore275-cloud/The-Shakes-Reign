@@ -195,6 +195,38 @@ if (req.method === "GET" && req.url === "/orders") {
     });
   }
 }
+const orderStatusViewMatch = req.url.match(
+  /^\/orders\/([^/]+)\/status$/
+);
+
+if (req.method === "GET" && orderStatusViewMatch) {
+  try {
+    const orderId = orderStatusViewMatch[1];
+
+    const { data, error } = await supabase
+      .from("orders")
+      .select("id, status")
+      .eq("id", orderId)
+      .single();
+
+    if (error || !data) {
+      return sendJson(res, 404, {
+        message: "Order not found",
+      });
+    }
+
+    return sendJson(res, 200, {
+      id: data.id,
+      status: data.status || "Pending",
+    });
+  } catch (error) {
+    console.error("Customer status error:", error);
+
+    return sendJson(res, 500, {
+      message: "Could not load order status",
+    });
+  }
+}
 // =========================
 // UPDATE ORDER STATUS
 // =========================
