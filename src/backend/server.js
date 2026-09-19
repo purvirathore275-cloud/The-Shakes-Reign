@@ -574,7 +574,34 @@ if (req.method === "GET" && req.url === "/orders") {
       return;
     }
   }
+// =========================
+// ADMIN LOGIN
+// =========================
 
+if (req.method === "POST" && req.url === "/admin-login") {
+  try {
+    const body = await getBody(req);
+
+    if (!body || body.password !== ADMIN_PASSWORD) {
+      return sendJson(res, 401, {
+        success: false,
+        message: "Invalid password",
+      });
+    }
+
+    return sendJson(res, 200, {
+      success: true,
+      message: "Admin login successful",
+    });
+  } catch (error) {
+    console.error("Admin login error:", error);
+
+    return sendJson(res, 500, {
+      success: false,
+      message: "Login failed",
+    });
+  }
+}
   // =========================
   // ROUTE NOT FOUND
   // =========================
