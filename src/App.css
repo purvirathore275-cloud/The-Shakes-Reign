@@ -1061,3 +1061,61 @@ footer p:last-child {
   margin: 18px 0;
   color: #b11226;
 }
+/* =========================
+   CUSTOMER ORDER TRACKING
+========================= */
+
+.customer-order-tracking {
+  max-width: 750px;
+  margin: 0 auto 30px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #eeeeee;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  text-align: left;
+}
+
+.tracking-label {
+  margin: 0 0 6px;
+  color: #b5121b;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.customer-order-tracking h3 {
+  margin: 0 0 18px;
+  color: #222;
+  font-size: 24px;
+}
+
+.tracking-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 19px;
+}
+
+.status-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #d99a00;
+}
+
+.status-dot.preparing {
+  background: #1976d2;
+}
+
+.status-dot.completed {
+  background: #16833a;
+}
+
+.tracking-message {
+  margin: 0;
+  color: #666;
+  font-size: 15px;
+}

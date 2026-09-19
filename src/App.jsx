@@ -10,6 +10,46 @@ import {
 } from "react-router-dom";
 
 const API = "https://the-shakes-reign.onrender.com";
+const [trackingOrderId, setTrackingOrderId] = useState(
+  () => localStorage.getItem("shakesReignOrderId") || ""
+);
+
+const [trackingStatus, setTrackingStatus] = useState("Pending");
+useEffect(() => {
+  if (!trackingOrderId) {
+    return;
+  }
+
+  const loadOrderStatus = async () => {
+    try {
+      const response = await fetch(
+        `https://the-shakes-reign.onrender.com/orders/${encodeURIComponent(
+          trackingOrderId
+        )}/status`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(data.message);
+        return;
+      }
+
+      setTrackingStatus(data.status || "Pending");
+    } catch (error) {
+      console.error("Order status error:", error);
+    }
+  };
+
+  loadOrderStatus();
+
+  const interval = setInterval(
+    loadOrderStatus,
+    10000
+  );
+
+  return () => clearInterval(interval);
+}, [trackingOrderId]);
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -176,20 +216,40 @@ function App() {
 
     try {
       const response = await fetch(
-        `${API}/orders`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(order),
-        }
-      );
+  "https://the-shakes-reign.onrender.com/orders",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  }
+);
 
-      if (!response.ok) {
-        throw new Error("Order could not be saved");
-      }
+const data = await response.json();
 
+if (!response.ok) {
+  throw new Error(
+    data.message || "Order could not be saved"
+  );
+}
+
+const newOrderId = data?.order?.id;
+
+if (!newOrderId) {
+  throw new Error("Order ID not received");
+}
+
+localStorage.setItem(
+  "shakesReignOrderId",
+  String(newOrderId)
+);
+
+setTrackingOrderId(String(newOrderId));
+
+setTrackingStatus(
+  data?.order?.status || "Pending"
+);
       const orderText = cart
         .map(
           (item) =>
@@ -199,11 +259,13 @@ function App() {
         )
         .join("\n");
 
-      const message =
-        `Hello, I want to order:\n\n` +
-        `${orderText}\n\n` +
-        `Total: ₹${total}`;
+      const message = `Hello, I want to order:
 
+Order ID: #${newOrderId}
+
+${orderText}
+
+Total: ₹${total}`;
       window.open(
         `https://wa.me/919794428589?text=${encodeURIComponent(
           message
@@ -533,6 +595,38 @@ function App() {
           <h2>
             Your <span>Order</span>
           </h2>
+          {trackingOrderId && (
+  <div className="customer-order-tracking">
+    <p className="tracking-label">
+      ORDER TRACKING
+    </p>
+
+    <h3>
+      Order #{trackingOrderId}
+    </h3>
+
+    <div className="tracking-status">
+      <span
+        className={`status-dot ${trackingStatus
+          .toLowerCase()
+          .replace(" ", "-")}`}
+      ></span>
+
+      <strong>{trackingStatus}</strong>
+    </div>
+
+    <p className="tracking-message">
+      {trackingStatus === "Pending" &&
+        "Your order has been received."}
+
+      {trackingStatus === "Preparing" &&
+        "Your order is being prepared."}
+
+      {trackingStatus === "Completed" &&
+        "Your order is ready. Thank you! ❤️"}
+    </p>
+  </div>
+)}
 
           {cart.length === 0 ? (
 
