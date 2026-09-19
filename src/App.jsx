@@ -1,7 +1,8 @@
-import AdminLogin from "./admin/AdminLogin";
 import { useEffect, useState } from "react";
 import "./App.css";
+
 import Admin from "./admin/Admin";
+import AdminLogin from "./admin/AdminLogin";
 
 import {
   BrowserRouter,
@@ -10,57 +11,42 @@ import {
 } from "react-router-dom";
 
 const API = "https://the-shakes-reign.onrender.com";
-const [trackingOrderId, setTrackingOrderId] = useState(
-  () => localStorage.getItem("shakesReignOrderId") || ""
-);
-
-const [trackingStatus, setTrackingStatus] = useState("Pending");
-useEffect(() => {
-  if (!trackingOrderId) {
-    return;
-  }
-
-  const loadOrderStatus = async () => {
-    try {
-      const response = await fetch(
-        `https://the-shakes-reign.onrender.com/orders/${encodeURIComponent(
-          trackingOrderId
-        )}/status`
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error(data.message);
-        return;
-      }
-
-      setTrackingStatus(data.status || "Pending");
-    } catch (error) {
-      console.error("Order status error:", error);
-    }
-  };
-
-  loadOrderStatus();
-
-  const interval = setInterval(
-    loadOrderStatus,
-    10000
-  );
-
-  return () => clearInterval(interval);
-}, [trackingOrderId]);
 
 function App() {
+  // =========================
+  // CART
+  // =========================
+
   const [cart, setCart] = useState([]);
-  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+
+  // =========================
+  // MENU
+  // =========================
 
   const [menuItems, setMenuItems] = useState([]);
   const [menuLoading, setMenuLoading] = useState(true);
 
   // =========================
-  // LOAD MENU
+  // ADMIN LOGIN
+  // =========================
+
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+
+  // =========================
+  // ORDER TRACKING
+  // =========================
+
+  const [trackingOrderId, setTrackingOrderId] = useState(
+    () =>
+      localStorage.getItem("shakesReignOrderId") || ""
+  );
+
+  const [trackingStatus, setTrackingStatus] =
+    useState("Pending");
+
+  // =========================
+  // LOAD LIVE MENU
   // =========================
 
   useEffect(() => {
@@ -68,21 +54,45 @@ function App() {
       try {
         setMenuLoading(true);
 
-        const response = await fetch(`${API}/menu`);
+        const response = await fetch(
+          `${API}/menu`
+        );
 
         if (!response.ok) {
-          throw new Error(`Menu API error: ${response.status}`);
+          throw new Error(
+            `Menu error: ${response.status}`
+          );
         }
 
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-          throw new Error("Menu data is not an array");
+          throw new Error(
+            "Menu data is not an array"
+          );
         }
 
-        setMenuItems(data);
+        // Remove unavailable dishes
+        const availableMenu = data
+          .map((category) => ({
+            ...category,
+            items: Array.isArray(category.items)
+              ? category.items.filter(
+                  (item) => item.available !== false
+                )
+              : [],
+          }))
+          .filter(
+            (category) => category.items.length > 0
+          );
+
+        setMenuItems(availableMenu);
       } catch (error) {
-        console.error("Menu loading error:", error);
+        console.error(
+          "Menu loading error:",
+          error
+        );
+
         setMenuItems([]);
       } finally {
         setMenuLoading(false);
@@ -93,38 +103,90 @@ function App() {
   }, []);
 
   // =========================
+  // CUSTOMER ORDER STATUS
+  // =========================
+
+  useEffect(() => {
+    if (!trackingOrderId) {
+      return;
+    }
+
+    const loadOrderStatus = async () => {
+      try {
+        const response = await fetch(
+          `${API}/orders/${encodeURIComponent(
+            trackingOrderId
+          )}/status`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error(
+            data.message ||
+              "Could not load order status"
+          );
+          return;
+        }
+
+        setTrackingStatus(
+          data.status || "Pending"
+        );
+      } catch (error) {
+        console.error(
+          "Order status error:",
+          error
+        );
+      }
+    };
+
+    loadOrderStatus();
+
+    const interval = setInterval(
+      loadOrderStatus,
+      10000
+    );
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [trackingOrderId]);
+
+  // =========================
   // ADD TO CART
   // =========================
 
   const addToCart = (item) => {
-    const existingIndex = cart.findIndex(
-      (cartItem) => cartItem.name === item.name
-    );
-
-    if (existingIndex !== -1) {
-      const updatedCart = cart.map((cartItem, index) =>
-        index === existingIndex
-          ? {
-              ...cartItem,
-              quantity: (cartItem.quantity || 1) + 1,
-            }
-          : cartItem
+    setCart((previousCart) => {
+      const existingItem = previousCart.find(
+        (cartItem) =>
+          cartItem.name === item.name
       );
 
-      setCart(updatedCart);
-    } else {
-      setCart([
-        ...cart,
+      if (existingItem) {
+        return previousCart.map(
+          (cartItem) =>
+            cartItem.name === item.name
+              ? {
+                  ...cartItem,
+                  quantity:
+                    cartItem.quantity + 1,
+                }
+              : cartItem
+        );
+      }
+
+      return [
+        ...previousCart,
         {
           name: item.name,
-          price: Number(item.price),
+          price: Number(item.price) || 0,
           image: item.image || "",
           quantity: 1,
         },
-      ]);
-    }
+      ];
+    });
 
-    // Open cart immediately
     setCartOpen(true);
   };
 
@@ -132,13 +194,13 @@ function App() {
   // INCREASE QUANTITY
   // =========================
 
-  const increaseQuantity = (index) => {
-    setCart(
-      cart.map((item, i) =>
-        i === index
+  const increaseQuantity = (name) => {
+    setCart((previousCart) =>
+      previousCart.map((item) =>
+        item.name === name
           ? {
               ...item,
-              quantity: (item.quantity || 1) + 1,
+              quantity: item.quantity + 1,
             }
           : item
       )
@@ -146,34 +208,22 @@ function App() {
   };
 
   // =========================
-  // DECREASE / REMOVE
+  // DECREASE QUANTITY
   // =========================
 
-  const decreaseQuantity = (index) => {
-    const currentQty = cart[index]?.quantity || 1;
-
-    if (currentQty > 1) {
-      setCart(
-        cart.map((item, i) =>
-          i === index
+  const decreaseQuantity = (name) => {
+    setCart((previousCart) =>
+      previousCart
+        .map((item) =>
+          item.name === name
             ? {
                 ...item,
-                quantity: currentQty - 1,
+                quantity: item.quantity - 1,
               }
             : item
         )
-      );
-
-      return;
-    }
-
-    const updatedCart = cart.filter((_, i) => i !== index);
-
-    setCart(updatedCart);
-
-    if (updatedCart.length === 0) {
-      setCartOpen(false);
-    }
+        .filter((item) => item.quantity > 0)
+    );
   };
 
   // =========================
@@ -182,103 +232,147 @@ function App() {
 
   const total = cart.reduce(
     (sum, item) =>
-      sum + Number(item.price) * (item.quantity || 1),
+      sum +
+      Number(item.price || 0) *
+        Number(item.quantity || 1),
     0
   );
-
-  // =========================
-  // TOTAL ITEMS
-  // =========================
 
   const totalItems = cart.reduce(
-    (sum, item) => sum + (item.quantity || 1),
+    (sum, item) =>
+      sum + Number(item.quantity || 1),
     0
   );
 
   // =========================
-  // WHATSAPP ORDER
+  // ORDER ON WHATSAPP
   // =========================
 
   const orderOnWhatsApp = async () => {
     if (cart.length === 0) {
-      alert("Please add something to your cart first.");
+      alert(
+        "Please add something to your cart first."
+      );
       return;
     }
 
     const order = {
       items: cart.map((item) => ({
         name: item.name,
-        price: item.price,
-        quantity: item.quantity || 1,
+        price: Number(item.price),
+        quantity: Number(item.quantity),
       })),
+
       total: total,
     };
 
     try {
       const response = await fetch(
-  "https://the-shakes-reign.onrender.com/orders",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(order),
-  }
-);
+        `${API}/orders`,
+        {
+          method: "POST",
 
-const data = await response.json();
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
 
-if (!response.ok) {
-  throw new Error(
-    data.message || "Order could not be saved"
-  );
-}
+          body: JSON.stringify(order),
+        }
+      );
 
-const newOrderId = data?.order?.id;
+      const data = await response.json();
 
-if (!newOrderId) {
-  throw new Error("Order ID not received");
-}
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Order could not be saved"
+        );
+      }
 
-localStorage.setItem(
-  "shakesReignOrderId",
-  String(newOrderId)
-);
+      // Get order ID from backend
+      const newOrderId =
+        data?.order?.id;
 
-setTrackingOrderId(String(newOrderId));
+      if (!newOrderId) {
+        throw new Error(
+          "Order ID was not received"
+        );
+      }
 
-setTrackingStatus(
-  data?.order?.status || "Pending"
-);
+      // Save order ID
+      localStorage.setItem(
+        "shakesReignOrderId",
+        String(newOrderId)
+      );
+
+      setTrackingOrderId(
+        String(newOrderId)
+      );
+
+      setTrackingStatus(
+        data?.order?.status ||
+          "Pending"
+      );
+
+      // WhatsApp message
       const orderText = cart
         .map(
           (item) =>
-            `${item.name} × ${item.quantity || 1} — ₹${
-              item.price * (item.quantity || 1)
+            `${item.name} × ${
+              item.quantity
+            } — ₹${
+              Number(item.price) *
+              Number(item.quantity)
             }`
         )
         .join("\n");
 
-      const message = `Hello, I want to order:
+      const message =
+        `Hello, I want to order:\n\n` +
+        `Order ID: #${newOrderId}\n\n` +
+        `${orderText}\n\n` +
+        `Total: ₹${total}`;
 
-Order ID: #${newOrderId}
-
-${orderText}
-
-Total: ₹${total}`;
       window.open(
         `https://wa.me/919794428589?text=${encodeURIComponent(
           message
         )}`,
         "_blank"
       );
+
+      // Close cart
+      setCartOpen(false);
+
+      alert(
+        `Order #${newOrderId} placed successfully!`
+      );
     } catch (error) {
-      console.error("Order error:", error);
+      console.error(
+        "Order error:",
+        error
+      );
 
       alert(
         "Order save nahi ho paya. Please try again."
       );
     }
+  };
+
+  // =========================
+  // STATUS MESSAGE
+  // =========================
+
+  const getStatusMessage = () => {
+    if (trackingStatus === "Preparing") {
+      return "Your order is being prepared.";
+    }
+
+    if (trackingStatus === "Completed") {
+      return "Your order is ready. Thank you! ❤️";
+    }
+
+    return "Your order has been received.";
   };
 
   // =========================
@@ -289,9 +383,7 @@ Total: ₹${total}`;
     return (
       <div className="app">
 
-        {/* =========================
-            NAVBAR
-        ========================= */}
+        {/* ================= NAVBAR ================= */}
 
         <header className="navbar">
 
@@ -303,10 +395,21 @@ Total: ₹${total}`;
           </div>
 
           <nav>
-            <a href="#home">Home</a>
-            <a href="#menu">Menu</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
+            <a href="#home">
+              Home
+            </a>
+
+            <a href="#menu">
+              Menu
+            </a>
+
+            <a href="#about">
+              About
+            </a>
+
+            <a href="#contact">
+              Contact
+            </a>
           </nav>
 
           <a
@@ -318,9 +421,7 @@ Total: ₹${total}`;
 
         </header>
 
-        {/* =========================
-            HERO
-        ========================= */}
+        {/* ================= HERO ================= */}
 
         <section
           id="home"
@@ -336,13 +437,17 @@ Total: ₹${total}`;
             <h1>
               The Taste
               <br />
-              <span>of Home.</span>
+              <span>
+                of Home.
+              </span>
             </h1>
 
             <p className="hero-text">
-              Delicious shakes, refreshing beverages
-              and comforting food — made to satisfy
-              every craving.
+              Delicious shakes,
+              refreshing beverages
+              and comforting food —
+              made to satisfy every
+              craving.
             </p>
 
             <div className="hero-buttons">
@@ -368,10 +473,12 @@ Total: ₹${total}`;
           <div className="hero-visual">
 
             <div className="shake-circle">
+
               <img
                 src="/logo.jpg"
                 alt="The Shakes Reign"
               />
+
             </div>
 
             <div className="floating-card card-one">
@@ -386,9 +493,7 @@ Total: ₹${total}`;
 
         </section>
 
-        {/* =========================
-            MENU
-        ========================= */}
+        {/* ================= MENU ================= */}
 
         <section
           id="menu"
@@ -403,44 +508,36 @@ Total: ₹${total}`;
 
             <h2>
               Something for{" "}
-              <span>Every Craving</span>
+              <span>
+                Every Craving
+              </span>
             </h2>
 
             <p>
-              Freshly prepared favourites
-              from The Shakes Reign.
+              Freshly prepared
+              favourites from
+              The Shakes Reign.
             </p>
 
           </div>
 
           {menuLoading ? (
-            <p className="empty-cart">
+            <div className="empty-cart">
               Loading menu...
-            </p>
+            </div>
           ) : menuItems.length === 0 ? (
-            <p className="empty-cart">
-              Menu is currently unavailable.
-            </p>
+            <div className="empty-cart">
+              Menu is currently
+              unavailable.
+            </div>
           ) : (
-            menuItems.map((section) => {
-
-              const availableItems = Array.isArray(
-                section.items
-              )
-                ? section.items.filter(
-                    (item) =>
-                      item.available !== false
-                  )
-                : [];
-
-              if (availableItems.length === 0) {
-                return null;
-              }
-
-              return (
+            menuItems.map(
+              (section) => (
                 <div
                   className="menu-category"
-                  key={section.category}
+                  key={
+                    section.category
+                  }
                 >
 
                   <h3 className="menu-category-title">
@@ -449,47 +546,53 @@ Total: ₹${total}`;
 
                   <div className="menu-grid">
 
-                    {availableItems.map(
-                      (item, index) => (
-
+                    {section.items.map(
+                      (item) => (
                         <div
                           className="menu-card"
-                          key={`${item.id || item.name}-${index}`}
+                          key={
+                            item.id ||
+                            item.name
+                          }
                         >
 
                           <div className="menu-image">
 
-                            {item.image ? (
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div>
-                                🥤
-                              </div>
-                            )}
+                            <img
+                              src={
+                                item.image
+                              }
+                              alt={
+                                item.name
+                              }
+                              loading="lazy"
+                            />
 
                           </div>
 
                           <div className="menu-card-content">
 
                             <h4>
-                              {item.name}
+                              {
+                                item.name
+                              }
                             </h4>
 
                             <div className="menu-bottom">
 
                               <span className="menu-price">
-                                ₹{item.price}
+                                ₹
+                                {
+                                  item.price
+                                }
                               </span>
 
                               <button
-                                type="button"
                                 className="add-btn"
                                 onClick={() =>
-                                  addToCart(item)
+                                  addToCart(
+                                    item
+                                  )
                                 }
                               >
                                 + Add
@@ -500,22 +603,19 @@ Total: ₹${total}`;
                           </div>
 
                         </div>
-
                       )
                     )}
 
                   </div>
 
                 </div>
-              );
-            })
+              )
+            )
           )}
 
         </section>
 
-        {/* =========================
-            ABOUT
-        ========================= */}
+        {/* ================= ABOUT ================= */}
 
         <section
           id="about"
@@ -531,17 +631,21 @@ Total: ₹${total}`;
             <h2>
               Made with love,
               <br />
+
               <span>
                 served with happiness.
               </span>
             </h2>
 
             <p>
-              At The Shakes Reign, we believe
-              every shake should make your day
-              a little sweeter. We prepare fresh
-              and delicious food and beverages
-              using quality ingredients and serve
+              At The Shakes Reign,
+              we believe every shake
+              should make your day
+              a little sweeter. We
+              prepare fresh and
+              delicious food and
+              beverages using quality
+              ingredients and serve
               them with love.
             </p>
 
@@ -549,9 +653,7 @@ Total: ₹${total}`;
 
         </section>
 
-        {/* =========================
-            CONTACT
-        ========================= */}
+        {/* ================= CONTACT ================= */}
 
         <section
           id="contact"
@@ -563,11 +665,13 @@ Total: ₹${total}`;
           </p>
 
           <h2>
-            Ready to satisfy your craving?
+            Ready to satisfy
+            your craving?
           </h2>
 
           <p>
-            Have a craving? Let The Shakes Reign
+            Have a craving?
+            Let The Shakes Reign
             satisfy it!
           </p>
 
@@ -582,9 +686,51 @@ Total: ₹${total}`;
 
         </section>
 
-        {/* =========================
-            CART SECTION
-        ========================= */}
+        {/* ================= CUSTOMER TRACKING ================= */}
+
+        {trackingOrderId && (
+          <section className="cart-section">
+
+            <p className="section-tag">
+              ORDER TRACKING
+            </p>
+
+            <h2>
+              Order{" "}
+              <span>
+                #{trackingOrderId}
+              </span>
+            </h2>
+
+            <div className="customer-order-tracking">
+
+              <div className="tracking-status">
+
+                <span
+                  className={`status-dot ${trackingStatus
+                    .toLowerCase()
+                    .replace(
+                      " ",
+                      "-"
+                    )}`}
+                />
+
+                <strong>
+                  {trackingStatus}
+                </strong>
+
+              </div>
+
+              <p className="tracking-message">
+                {getStatusMessage()}
+              </p>
+
+            </div>
+
+          </section>
+        )}
+
+        {/* ================= CART ================= */}
 
         <section className="cart-section">
 
@@ -593,99 +739,85 @@ Total: ₹${total}`;
           </p>
 
           <h2>
-            Your <span>Order</span>
+            Your{" "}
+            <span>
+              Order
+            </span>
           </h2>
-          {trackingOrderId && (
-  <div className="customer-order-tracking">
-    <p className="tracking-label">
-      ORDER TRACKING
-    </p>
-
-    <h3>
-      Order #{trackingOrderId}
-    </h3>
-
-    <div className="tracking-status">
-      <span
-        className={`status-dot ${trackingStatus
-          .toLowerCase()
-          .replace(" ", "-")}`}
-      ></span>
-
-      <strong>{trackingStatus}</strong>
-    </div>
-
-    <p className="tracking-message">
-      {trackingStatus === "Pending" &&
-        "Your order has been received."}
-
-      {trackingStatus === "Preparing" &&
-        "Your order is being prepared."}
-
-      {trackingStatus === "Completed" &&
-        "Your order is ready. Thank you! ❤️"}
-    </p>
-  </div>
-)}
 
           {cart.length === 0 ? (
 
             <p className="empty-cart">
               Your cart is empty.
-              Add something delicious! 🥤
+              Add something delicious!
+              🥤
             </p>
 
           ) : (
 
             <div className="cart-box">
 
-              {cart.map((item, index) => (
+              {cart.map(
+                (item) => (
+                  <div
+                    className="cart-item"
+                    key={item.name}
+                  >
 
-                <div
-                  className="cart-item"
-                  key={`${item.name}-${index}`}
-                >
+                    <div>
+                      <strong>
+                        {item.name}
+                      </strong>
 
-                  <span>
-                    {item.name} ×{" "}
-                    {item.quantity || 1}
-                  </span>
+                      <div className="cart-item-price">
+                        ₹
+                        {item.price}
+                      </div>
+                    </div>
 
-                  <div className="quantity-controls">
+                    <div className="quantity-controls">
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        decreaseQuantity(index)
-                      }
-                    >
-                      −
-                    </button>
+                      <button
+                        onClick={() =>
+                          decreaseQuantity(
+                            item.name
+                          )
+                        }
+                      >
+                        −
+                      </button>
 
-                    <span>
-                      {item.quantity || 1}
-                    </span>
+                      <span>
+                        {
+                          item.quantity
+                        }
+                      </span>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        increaseQuantity(index)
-                      }
-                    >
-                      +
-                    </button>
+                      <button
+                        onClick={() =>
+                          increaseQuantity(
+                            item.name
+                          )
+                        }
+                      >
+                        +
+                      </button>
+
+                    </div>
+
+                    <strong>
+                      ₹
+                      {Number(
+                        item.price
+                      ) *
+                        Number(
+                          item.quantity
+                        )}
+                    </strong>
 
                   </div>
-
-                  <strong>
-                    ₹
-                    {item.price *
-                      (item.quantity || 1)}
-                  </strong>
-
-                </div>
-
-              ))}
+                )
+              )}
 
               <div className="cart-total">
 
@@ -700,9 +832,10 @@ Total: ₹${total}`;
               </div>
 
               <button
-                type="button"
                 className="whatsapp-order-btn"
-                onClick={orderOnWhatsApp}
+                onClick={
+                  orderOnWhatsApp
+                }
               >
                 💬 Order on WhatsApp
               </button>
@@ -713,124 +846,7 @@ Total: ₹${total}`;
 
         </section>
 
-        {/* =========================
-            CART POPUP
-        ========================= */}
-
-        {cartOpen && cart.length > 0 && (
-
-          <div
-            className="cart-popup"
-            onClick={() =>
-              setCartOpen(false)
-            }
-          >
-
-            <div
-              className="cart-popup-box"
-              onClick={(event) =>
-                event.stopPropagation()
-              }
-            >
-
-              <div className="cart-popup-header">
-
-                <h2>
-                  Your Cart
-                </h2>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCartOpen(false)
-                  }
-                >
-                  ✕
-                </button>
-
-              </div>
-
-              {cart.map((item, index) => (
-
-                <div
-                  className="cart-popup-item"
-                  key={`${item.name}-popup-${index}`}
-                >
-
-                  <div>
-
-                    <strong>
-                      {item.name}
-                    </strong>
-
-                    <p>
-                      ₹{item.price} ×{" "}
-                      {item.quantity || 1}
-                    </p>
-
-                  </div>
-
-                  <div className="cart-qty">
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        decreaseQuantity(index)
-                      }
-                    >
-                      −
-                    </button>
-
-                    <span>
-                      {item.quantity || 1}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        increaseQuantity(index)
-                      }
-                    >
-                      +
-                    </button>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-              <div className="cart-popup-total">
-                Total: ₹{total}
-              </div>
-
-              <button
-                type="button"
-                className="whatsapp-order-btn"
-                onClick={orderOnWhatsApp}
-              >
-                💬 Order on WhatsApp
-              </button>
-
-              <button
-                type="button"
-                className="continue-shopping-btn"
-                onClick={() =>
-                  setCartOpen(false)
-                }
-              >
-                🛍️ Continue Shopping
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
-
-        {/* =========================
-            FOOTER
-        ========================= */}
+        {/* ================= FOOTER ================= */}
 
         <footer>
 
@@ -845,8 +861,161 @@ Total: ₹${total}`;
 
         </footer>
 
+        {/* ================= FLOATING CART ================= */}
+
+        {cart.length > 0 && (
+          <button
+            className="floating-cart-btn"
+            onClick={() =>
+              setCartOpen(true)
+            }
+          >
+            🛒{" "}
+            <span>
+              {totalItems}
+            </span>
+          </button>
+        )}
+
+        {/* ================= CART POPUP ================= */}
+
+        {cartOpen && (
+          <div className="cart-popup-overlay">
+
+            <div className="cart-popup">
+
+              <div className="cart-popup-header">
+
+                <h3>
+                  Your Cart
+                </h3>
+
+                <button
+                  onClick={() =>
+                    setCartOpen(false)
+                  }
+                >
+                  ✕
+                </button>
+
+              </div>
+
+              {cart.length === 0 ? (
+
+                <p className="empty-cart">
+                  Your cart is empty.
+                </p>
+
+              ) : (
+
+                <>
+                  <div className="cart-popup-items">
+
+                    {cart.map(
+                      (item) => (
+                        <div
+                          className="cart-popup-item"
+                          key={item.name}
+                        >
+
+                          <div>
+                            <strong>
+                              {item.name}
+                            </strong>
+
+                            <p>
+                              ₹
+                              {
+                                item.price
+                              }
+                            </p>
+                          </div>
+
+                          <div className="quantity-controls">
+
+                            <button
+                              onClick={() =>
+                                decreaseQuantity(
+                                  item.name
+                                )
+                              }
+                            >
+                              −
+                            </button>
+
+                            <span>
+                              {
+                                item.quantity
+                              }
+                            </span>
+
+                            <button
+                              onClick={() =>
+                                increaseQuantity(
+                                  item.name
+                                )
+                              }
+                            >
+                              +
+                            </button>
+
+                          </div>
+
+                        </div>
+                      )
+                    )}
+
+                  </div>
+
+                  <div className="cart-popup-total">
+
+                    <span>
+                      Total
+                    </span>
+
+                    <strong>
+                      ₹{total}
+                    </strong>
+
+                  </div>
+
+                  <button
+                    className="whatsapp-order-btn"
+                    onClick={
+                      orderOnWhatsApp
+                    }
+                  >
+                    💬 Order on WhatsApp
+                  </button>
+
+                </>
+              )}
+
+            </div>
+
+          </div>
+        )}
+
       </div>
     );
+  };
+
+  // =========================
+  // ADMIN PAGE
+  // =========================
+
+  const AdminPage = () => {
+    if (!adminLoggedIn) {
+      return (
+        <AdminLogin
+          onLogin={() =>
+            setAdminLoggedIn(true)
+          }
+        />
+      );
+    }
+
+    return <Admin />;
   };
 
   // =========================
@@ -864,17 +1033,9 @@ Total: ₹${total}`;
         />
 
         <Route
-  path="/admin"
-  element={
-    adminLoggedIn ? (
-      <Admin />
-    ) : (
-      <AdminLogin
-        onLogin={() => setAdminLoggedIn(true)}
-      />
-    )
-  }
-/>
+          path="/admin"
+          element={<AdminPage />}
+        />
 
       </Routes>
 
