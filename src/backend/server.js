@@ -4,8 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 dotenv.config({ path: "./src/backend/.env" });
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SECRET_KEY
 );
 const PORT = process.env.PORT || 5000;
 
@@ -123,31 +122,49 @@ const server = http.createServer(async (req, res) => {
   // ADMIN LOGIN
   // =========================
 
-  if (req.method === "POST" && req.url === "/admin-login") {
-    try {
-      const body = await getBody(req);
+  if (req.method === "POST" && req.url === "/orders") {
+  try {
+    const order = await getBody(req);
 
-      if (!body || body.password !== ADMIN_PASSWORD) {
-        return sendJson(res, 401, {
-          success: false,
-          message: "Invalid password",
-        });
-      }
+    const { data, error } = await supabase
+      .from("orders")
+      .insert([
+        {
+          customer_name: order.customer_name || "",
+          phone: order.phone || "",
+          address: order.address || "",
+          items: order.items || [],
+          total: order.total || 0,
+        },
+      ])
+      .select()
+      .single();
 
-      return sendJson(res, 200, {
-        success: true,
-        message: "Admin login successful",
-      });
-    } catch (error) {
-      console.error("Admin login error:", error);
+    if (error) {
+      console.error("Supabase order error:", error);
 
       return sendJson(res, 500, {
-        success: false,
-        message: "Login failed",
+        message: "Order save failed",
+        error: error.message,
       });
     }
-  }
 
+    sendJson(res, 201, {
+      message: "Order received successfully!",
+      order: data,
+    });
+
+    return;
+  } catch (error) {
+    console.error("Order error:", error);
+
+    sendJson(res, 400, {
+      message: "Invalid order data",
+    });
+
+    return;
+  }
+}
   // =========================
 // GET ORDERS
 // =========================
