@@ -180,24 +180,19 @@ if (req.method === "GET" && req.url === "/orders") {
     if (error) {
       console.error("Supabase orders error:", error);
 
-      sendJson(res, 500, {
-        message: "Could not load orders",
+      return sendJson(res, 500, {
+        message: "Orders load failed",
+        error: error.message,
       });
-
-      return;
     }
 
-    sendJson(res, 200, data);
-
-    return;
+    return sendJson(res, 200, data || []);
   } catch (error) {
     console.error("Orders error:", error);
 
-    sendJson(res, 500, {
-      message: "Could not load orders",
+    return sendJson(res, 500, {
+      message: "Orders load failed",
     });
-
-    return;
   }
 }
   // =========================
