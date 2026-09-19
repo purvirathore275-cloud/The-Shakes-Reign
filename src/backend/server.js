@@ -195,6 +195,61 @@ if (req.method === "GET" && req.url === "/orders") {
     });
   }
 }
+// =========================
+// UPDATE ORDER STATUS
+// =========================
+
+const orderStatusMatch = req.url.match(
+  /^\/orders\/([^/]+)\/status$/
+);
+
+if (req.method === "PATCH" && orderStatusMatch) {
+  try {
+    const orderId = orderStatusMatch[1];
+    const body = await getBody(req);
+
+    const allowedStatuses = [
+      "Pending",
+      "Preparing",
+      "Completed",
+    ];
+
+    if (!allowedStatuses.includes(body.status)) {
+      return sendJson(res, 400, {
+        message: "Invalid order status",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("orders")
+      .update({
+        status: body.status,
+      })
+      .eq("id", orderId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Status update error:", error);
+
+      return sendJson(res, 500, {
+        message: "Status update failed",
+        error: error.message,
+      });
+    }
+
+    return sendJson(res, 200, {
+      message: "Order status updated",
+      order: data,
+    });
+  } catch (error) {
+    console.error("Status error:", error);
+
+    return sendJson(res, 500, {
+      message: "Status update failed",
+    });
+  }
+}
   // =========================
   // CREATE ORDER
   // =========================
