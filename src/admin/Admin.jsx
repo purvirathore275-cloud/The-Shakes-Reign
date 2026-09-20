@@ -11,6 +11,8 @@ function Admin() {
 
   const [search, setSearch] = useState("");
 
+  const [activeTab, setActiveTab] = useState("orders");
+
   const [dish, setDish] = useState({
     name: "",
     category: "Shakes & Lassi",
@@ -414,17 +416,26 @@ const addCategory = async () => {
 
 <div className="admin-tabs">
 
-  <button className="admin-tab active">
+  <button
+    type="button"
+    className={`admin-tab ${activeTab === "orders" ? "active" : ""}`}
+    onClick={() => setActiveTab("orders")}
+  >
     📦 Orders
   </button>
 
-  <button className="admin-tab">
+  <button
+    type="button"
+    className={`admin-tab ${activeTab === "menu" ? "active" : ""}`}
+    onClick={() => setActiveTab("menu")}
+  >
     🍽️ Menu Management
   </button>
 
 </div>
 {/* ================= ORDERS ================= */}
 
+{activeTab === "orders" && (
 <section className="orders-management">
 
   <div className="orders-heading">
@@ -521,30 +532,31 @@ const addCategory = async () => {
             </label>
 
             <select
-  value={order.status || "Pending"}
-  onChange={(e) =>
-    updateOrderStatus(
-      order.id,
-      e.target.value
-    )
-  }
->
-  <option value="Pending">
-    ⏳ Pending - Awaiting Confirmation
-  </option>
+              value={order.status || "Pending"}
+              onChange={(e) =>
+                updateOrderStatus(
+                  order.id,
+                  e.target.value
+                )
+              }
+            >
+              <option value="Pending">
+                Pending
+              </option>
 
-  <option value="Confirmed">
-    ✅ Confirmed
-  </option>
+              <option value="Confirmed">
+                Confirmed
+              </option>
 
-  <option value="Preparing">
-    👨‍🍳 Preparing
-  </option>
+              <option value="Preparing">
+                Preparing
+              </option>
 
-  <option value="Completed">
-    🎉 Completed
-  </option>
-</select>
+              <option value="Completed">
+                Completed
+              </option>
+            </select>
+
           </div>
 
         </div>
@@ -555,9 +567,11 @@ const addCategory = async () => {
   )}
 
 </section>
+)}
 
         {/* ================= MENU ================= */}
 
+{activeTab === "menu" && (
         <section className="menu-management">
 
           {/* MENU HEADING */}
@@ -814,6 +828,7 @@ const addCategory = async () => {
           </div>
 
         </section>
+)}
 
       </main>
 

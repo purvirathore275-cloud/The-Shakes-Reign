@@ -1490,3 +1490,155 @@ footer p:last-child {
     grid-template-columns: 1fr;
   }
 }
+/* =========================
+   CART POPUP RESPONSIVE FIX
+========================= */
+
+.cart-popup {
+  width: min(720px, calc(100vw - 32px));
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.cart-popup * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.cart-popup input,
+.cart-popup textarea {
+  width: 100%;
+  min-width: 0;
+}
+
+.cart-popup textarea {
+  resize: vertical;
+}
+
+.cart-popup button {
+  white-space: normal;
+}
+
+@media (max-width: 700px) {
+  .cart-popup {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    padding: 18px;
+  }
+
+  .cart-popup-overlay {
+    padding: 12px;
+  }
+}
+/* =========================
+   FINAL CART POPUP FIX
+========================= */
+
+.cart-popup {
+  display: block !important;
+  width: min(620px, calc(100vw - 24px)) !important;
+  max-width: 620px !important;
+  max-height: 90vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Customer details full width */
+.cart-popup .customer-details-form {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 18px 0 !important;
+}
+
+/* Input fields */
+.cart-popup .customer-details-form input,
+.cart-popup .customer-details-form textarea {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Cart items below customer details */
+.cart-popup-items {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Each cart item */
+.cart-popup-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 15px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 14px 0 !important;
+  border-bottom: 1px solid #eeeeee !important;
+  box-sizing: border-box !important;
+}
+
+/* Food name + price */
+.cart-popup-item > div:first-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Quantity buttons */
+.cart-popup-item .quantity-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.cart-popup-item .quantity-controls button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+}
+
+/* Total */
+.cart-popup-total {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 18px !important;
+}
+
+/* WhatsApp button */
+.cart-popup .whatsapp-order-btn {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 18px !important;
+  box-sizing: border-box !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .cart-popup {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 18px !important;
+  }
+
+  .cart-popup-item {
+    gap: 10px !important;
+  }
+
+  .cart-popup-item .quantity-controls {
+    gap: 5px !important;
+  }
+}
