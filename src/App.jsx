@@ -410,6 +410,7 @@ function App() {
             <a href="#contact">
               Contact
             </a>
+            <a href="#tracking">Track Order</a>
           </nav>
 
           <a
@@ -689,8 +690,7 @@ function App() {
         {/* ================= CUSTOMER TRACKING ================= */}
 
         {trackingOrderId && (
-          <section className="cart-section">
-
+          <section id="tracking" className="cart-section">
             <p className="section-tag">
               ORDER TRACKING
             </p>
