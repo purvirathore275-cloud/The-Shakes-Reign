@@ -737,26 +737,76 @@ alert(
 
             <div className="customer-order-tracking">
 
-              <div className="tracking-status">
+              <div className="tracking-timeline">
 
-                <span
-                  className={`status-dot ${trackingStatus
-                    .toLowerCase()
-                    .replace(
-                      " ",
-                      "-"
-                    )}`}
-                />
+  <div
+    className={`tracking-step ${
+      ["Pending", "Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">🛒</div>
 
-                <strong>
-                  {trackingStatus}
-                </strong>
+    <div>
+      <strong>Order Placed</strong>
+      <p>Your order has been received.</p>
+    </div>
+  </div>
 
-              </div>
+  <div
+    className={`tracking-line ${
+      ["Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  />
 
-              <p className="tracking-message">
-                {getStatusMessage()}
-              </p>
+  <div
+    className={`tracking-step ${
+      ["Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">👨‍🍳</div>
+
+    <div>
+      <strong>Preparing</strong>
+      <p>Your order is being prepared.</p>
+    </div>
+  </div>
+
+  <div
+    className={`tracking-line ${
+      trackingStatus === "Completed"
+        ? "active"
+        : ""
+    }`}
+  />
+
+  <div
+    className={`tracking-step ${
+      trackingStatus === "Completed"
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">✅</div>
+
+    <div>
+      <strong>Completed</strong>
+      <p>Your order is ready. Thank you! ❤️</p>
+    </div>
+  </div>
+
+</div>
 
             </div>
 
