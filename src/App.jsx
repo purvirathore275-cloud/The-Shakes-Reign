@@ -375,7 +375,6 @@ if (!whatsappWindow) {
   return;
 }
 
-// Close cart
 setCartOpen(false);
 
 alert(
