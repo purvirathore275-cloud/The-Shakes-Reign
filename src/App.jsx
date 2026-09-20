@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 import Admin from "./admin/Admin";
@@ -20,9 +20,9 @@ function App() {
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
 
-  const [customerName, setCustomerName] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
+  const customerNameRef = useRef(null);
+  const customerPhoneRef = useRef(null);
+  const customerAddressRef = useRef(null);
 
   // =========================
   // MENU
@@ -260,6 +260,10 @@ function App() {
       return;
     }
 
+    const customerName = customerNameRef.current?.value || "";
+    const customerPhone = customerPhoneRef.current?.value || "";
+    const customerAddress = customerAddressRef.current?.value || "";
+
     if (!customerName.trim()) {
       alert("Please enter your name.");
       return;
@@ -359,19 +363,24 @@ function App() {
         `${orderText}\n\n` +
         `Total: ₹${total}`;
 
-      window.open(
-        `https://wa.me/919794428589?text=${encodeURIComponent(
-          message
-        )}`,
-        "_blank"
-      );
+      const whatsappWindow = window.open(
+  `https://wa.me/919794428589?text=${encodeURIComponent(
+    message
+  )}`,
+  "_blank"
+);
 
-      // Close cart
-      setCartOpen(false);
+if (!whatsappWindow) {
+  alert("Please allow popups in your browser to continue with WhatsApp.");
+  return;
+}
 
-      alert(
-        `Order #${newOrderId} placed successfully!`
-      );
+// Close cart
+setCartOpen(false);
+
+alert(
+  `Order #${newOrderId} created successfully.\n\nWhatsApp has been opened. Please tap Send in WhatsApp to complete your order.`
+);
     } catch (error) {
       console.error(
         "Order error:",
@@ -956,10 +965,7 @@ function App() {
                     <input
                       type="text"
                       placeholder="Your Name"
-                      value={customerName}
-                      onChange={(e) =>
-                        setCustomerName(e.target.value)
-                      }
+                      ref={customerNameRef}
                       style={{
                         width: "100%",
                         padding: "12px 14px",
@@ -975,10 +981,7 @@ function App() {
                     <input
                       type="tel"
                       placeholder="Phone Number"
-                      value={customerPhone}
-                      onChange={(e) =>
-                        setCustomerPhone(e.target.value)
-                      }
+                      ref={customerPhoneRef}
                       style={{
                         width: "100%",
                         padding: "12px 14px",
@@ -993,10 +996,7 @@ function App() {
 
                     <textarea
                       placeholder="Delivery Address"
-                      value={customerAddress}
-                      onChange={(e) =>
-                        setCustomerAddress(e.target.value)
-                      }
+                      ref={customerAddressRef}
                       rows="3"
                       style={{
                         width: "100%",
@@ -1131,12 +1131,12 @@ function App() {
 
         <Route
           path="/"
-          element={HomePage()}
+          element={<HomePage />}
         />
 
         <Route
           path="/admin"
-          element={AdminPage()}
+          element={<AdminPage />}
         />
 
       </Routes>
