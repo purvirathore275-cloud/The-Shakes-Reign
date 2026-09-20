@@ -397,17 +397,20 @@ alert(
   // =========================
 
   const getStatusMessage = () => {
-    if (trackingStatus === "Preparing") {
-      return "Your order is being prepared.";
-    }
+  if (trackingStatus === "Confirmed") {
+    return "Your order has been confirmed by the restaurant.";
+  }
 
-    if (trackingStatus === "Completed") {
-      return "Your order is ready. Thank you! ❤️";
-    }
+  if (trackingStatus === "Preparing") {
+    return "Your order is being prepared.";
+  }
 
-    return "Your order has been received.";
-  };
+  if (trackingStatus === "Completed") {
+    return "Your order is ready. Thank you! ❤️";
+  }
 
+  return "Waiting for restaurant confirmation.";
+};
   // =========================
   // HOME PAGE
   // =========================
@@ -739,6 +742,121 @@ alert(
 
               <div className="tracking-timeline">
 
+  {/* ORDER PLACED */}
+
+  <div
+    className={`tracking-step ${
+      ["Pending", "Confirmed", "Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">🛒</div>
+
+    <div>
+      <strong>Order Placed</strong>
+      <p>Your order has been submitted.</p>
+    </div>
+  </div>
+
+
+  <div
+    className={`tracking-line ${
+      ["Confirmed", "Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  />
+
+
+  {/* CONFIRMED */}
+
+  <div
+    className={`tracking-step ${
+      ["Confirmed", "Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">✅</div>
+
+    <div>
+      <strong>Confirmed</strong>
+      <p>
+        Restaurant has confirmed your order.
+      </p>
+    </div>
+  </div>
+
+
+  <div
+    className={`tracking-line ${
+      ["Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  />
+
+
+  {/* PREPARING */}
+
+  <div
+    className={`tracking-step ${
+      ["Preparing", "Completed"].includes(
+        trackingStatus
+      )
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">👨‍🍳</div>
+
+    <div>
+      <strong>Preparing</strong>
+      <p>
+        Your order is being prepared.
+      </p>
+    </div>
+  </div>
+
+
+  <div
+    className={`tracking-line ${
+      trackingStatus === "Completed"
+        ? "active"
+        : ""
+    }`}
+  />
+
+
+  {/* COMPLETED */}
+
+  <div
+    className={`tracking-step ${
+      trackingStatus === "Completed"
+        ? "active"
+        : ""
+    }`}
+  >
+    <div className="tracking-icon">🎉</div>
+
+    <div>
+      <strong>Completed</strong>
+      <p>
+        Your order is ready. Thank you! ❤️
+      </p>
+    </div>
+  </div>
+
+</div>
   <div
     className={`tracking-step ${
       ["Pending", "Preparing", "Completed"].includes(
@@ -808,7 +926,6 @@ alert(
 
 </div>
 
-            </div>
 
           </section>
         )}

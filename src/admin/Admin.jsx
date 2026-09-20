@@ -521,27 +521,30 @@ const addCategory = async () => {
             </label>
 
             <select
-              value={order.status || "Pending"}
-              onChange={(e) =>
-                updateOrderStatus(
-                  order.id,
-                  e.target.value
-                )
-              }
-            >
-              <option value="Pending">
-                Pending
-              </option>
+  value={order.status || "Pending"}
+  onChange={(e) =>
+    updateOrderStatus(
+      order.id,
+      e.target.value
+    )
+  }
+>
+  <option value="Pending">
+    ⏳ Pending - Awaiting Confirmation
+  </option>
 
-              <option value="Preparing">
-                Preparing
-              </option>
+  <option value="Confirmed">
+    ✅ Confirmed
+  </option>
 
-              <option value="Completed">
-                Completed
-              </option>
-            </select>
+  <option value="Preparing">
+    👨‍🍳 Preparing
+  </option>
 
+  <option value="Completed">
+    🎉 Completed
+  </option>
+</select>
           </div>
 
         </div>

@@ -241,11 +241,11 @@ if (req.method === "PATCH" && orderStatusMatch) {
     const body = await getBody(req);
 
     const allowedStatuses = [
-      "Pending",
-      "Preparing",
-      "Completed",
-    ];
-
+  "Pending",
+  "Confirmed",
+  "Preparing",
+  "Completed",
+];
     if (!allowedStatuses.includes(body.status)) {
       return sendJson(res, 400, {
         message: "Invalid order status",
