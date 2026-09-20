@@ -451,6 +451,7 @@ function App() {
               Contact
             </a>
             <a href="#tracking">Track Order</a>
+            <a href="#reviews">Reviews</a>
           </nav>
 
           <a
@@ -693,6 +694,46 @@ function App() {
           </div>
 
         </section>
+        {/* Reviews Section */}
+<section id="reviews" className="reviews-section">
+  <h1 style={{ color: "red" }}>REVIEWS TEST</h1>
+  <div className="reviews-heading">
+    <p className="section-tag">CUSTOMER LOVE</p>
+
+    <h2>
+      What Our <span>Customers Say</span>
+    </h2>
+
+    <p>
+      Loved by shake and food lovers.
+    </p>
+  </div>
+
+  <div className="reviews-grid">
+    {[
+      {
+        name: "Sample Customer",
+        text: "The shakes were fresh and delicious. Loved it!",
+      },
+      {
+        name: "Sample Customer",
+        text: "Amazing taste and quick service.",
+      },
+      {
+        name: "Sample Customer",
+        text: "The dry fruit lassi was fantastic!",
+      },
+    ].map((review, index) => (
+      <div className="review-card" key={index}>
+        <div className="review-stars">★★★★★</div>
+
+        <p>“{review.text}”</p>
+
+        <strong>— {review.name}</strong>
+      </div>
+    ))}
+  </div>
+</section>
 
         {/* ================= CONTACT ================= */}
 
