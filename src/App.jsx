@@ -20,6 +20,10 @@ function App() {
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
 
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+
   // =========================
   // MENU
   // =========================
@@ -256,7 +260,25 @@ function App() {
       return;
     }
 
+    if (!customerName.trim()) {
+      alert("Please enter your name.");
+      return;
+    }
+
+    if (!customerPhone.trim()) {
+      alert("Please enter your phone number.");
+      return;
+    }
+
+    if (!customerAddress.trim()) {
+      alert("Please enter your delivery address.");
+      return;
+    }
+
     const order = {
+      customer_name: customerName.trim(),
+      phone: customerPhone.trim(),
+      address: customerAddress.trim(),
       items: cart.map((item) => ({
         name: item.name,
         price: Number(item.price),
@@ -330,7 +352,10 @@ function App() {
 
       const message =
         `Hello, I want to order:\n\n` +
-        `Order ID: #${newOrderId}\n\n` +
+        `Order ID: #${newOrderId}\n` +
+        `Name: ${customerName.trim()}\n` +
+        `Phone: ${customerPhone.trim()}\n` +
+        `Address: ${customerAddress.trim()}\n\n` +
         `${orderText}\n\n` +
         `Total: ₹${total}`;
 
@@ -909,6 +934,83 @@ function App() {
               ) : (
 
                 <>
+                  <div
+                    className="customer-details-form"
+                    style={{
+                      margin: "18px 0",
+                      padding: "16px",
+                      background: "#fff7f7",
+                      border: "1px solid #f0d0d0",
+                      borderRadius: "14px",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        margin: "0 0 12px",
+                        color: "#b40000",
+                      }}
+                    >
+                      Customer Details
+                    </h4>
+
+                    <input
+                      type="text"
+                      placeholder="Your Name"
+                      value={customerName}
+                      onChange={(e) =>
+                        setCustomerName(e.target.value)
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        marginBottom: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "9px",
+                        outline: "none",
+                        background: "#fff",
+                        color: "#222",
+                      }}
+                    />
+
+                    <input
+                      type="tel"
+                      placeholder="Phone Number"
+                      value={customerPhone}
+                      onChange={(e) =>
+                        setCustomerPhone(e.target.value)
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        marginBottom: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "9px",
+                        outline: "none",
+                        background: "#fff",
+                        color: "#222",
+                      }}
+                    />
+
+                    <textarea
+                      placeholder="Delivery Address"
+                      value={customerAddress}
+                      onChange={(e) =>
+                        setCustomerAddress(e.target.value)
+                      }
+                      rows="3"
+                      style={{
+                        width: "100%",
+                        padding: "12px 14px",
+                        border: "1px solid #ddd",
+                        borderRadius: "9px",
+                        outline: "none",
+                        background: "#fff",
+                        color: "#222",
+                        resize: "vertical",
+                      }}
+                    />
+                  </div>
+
                   <div className="cart-popup-items">
 
                     {cart.map(
