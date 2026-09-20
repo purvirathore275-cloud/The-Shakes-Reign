@@ -1131,12 +1131,12 @@ function App() {
 
         <Route
           path="/"
-          element={<HomePage />}
+          element={HomePage()}
         />
 
         <Route
           path="/admin"
-          element={<AdminPage />}
+          element={AdminPage()}
         />
 
       </Routes>
