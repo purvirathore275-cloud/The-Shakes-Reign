@@ -1119,3 +1119,28 @@ footer p:last-child {
   color: #666;
   font-size: 15px;
 }
+/* Customer details input fix */
+.cart-popup-overlay {
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+
+.cart-popup {
+  position: relative !important;
+  z-index: 10000 !important;
+  pointer-events: auto !important;
+}
+
+.cart-popup input,
+.cart-popup textarea {
+  position: relative !important;
+  z-index: 10001 !important;
+  pointer-events: auto !important;
+  cursor: text !important;
+  user-select: text !important;
+}
+
+.cart-popup button {
+  position: relative;
+  z-index: 10001;
+}
