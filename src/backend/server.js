@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./src/backend/.env" });
 const supabase = createClient(
   "https://buemnckuifchzwladrak.supabase.co",
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+process.env.SUPABASE_SECRET_KEY
 );
 const PORT = process.env.PORT || 5000;
 
