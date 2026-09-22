@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./src/backend/.env" });
 const supabase = createClient(
   "https://buemnckuifchzwladrak.supabase.co",
-  process.env.SUPABASE_SECRET_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 const PORT = process.env.PORT || 5000;
 
@@ -282,6 +282,62 @@ if (req.method === "PATCH" && orderStatusMatch) {
     });
   }
 }
+// =========================
+// UPDATE PAYMENT STATUS
+// =========================
+
+const paymentStatusMatch = req.url.match(
+  /^\/orders\/([^/]+)\/payment-status$/
+);
+
+if (req.method === "PATCH" && paymentStatusMatch) {
+  try {
+    const orderId = paymentStatusMatch[1];
+    const body = await getBody(req);
+
+    const allowedPaymentStatuses = [
+      "Not Paid",
+      "Pending Verification",
+      "Verified",
+      "Rejected",
+    ];
+
+    if (!allowedPaymentStatuses.includes(body.payment_status)) {
+      return sendJson(res, 400, {
+        message: "Invalid payment status",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("orders")
+      .update({
+        payment_status: body.payment_status,
+      })
+      .eq("id", orderId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Payment status update error:", error);
+
+      return sendJson(res, 500, {
+        message: "Payment status update failed",
+        error: error.message,
+      });
+    }
+
+    return sendJson(res, 200, {
+      message: "Payment status updated",
+      order: data,
+    });
+  } catch (error) {
+    console.error("Payment status error:", error);
+
+    return sendJson(res, 500, {
+      message: "Payment status update failed",
+    });
+  }
+}
   // =========================
   // CREATE ORDER
   // =========================
@@ -333,19 +389,62 @@ if (req.method === "PATCH" && orderStatusMatch) {
   }
 }
   // =========================
-  // GET MENU
-  // =========================
+// GET MENU FROM SUPABASE
+// =========================
 
-  if (
-    req.method === "GET" &&
-    (req.url === "/menu" || req.url === "/menu/")
-  ) {
-    const menu = readJsonFile(MENU_FILE);
+if (
+  req.method === "GET" &&
+  (req.url === "/menu" || req.url === "/menu/")
+) {
+  try {
+    const { data, error } = await supabase
+      .from("menu")
+      .select("*")
+      .order("created_at", { ascending: true });
 
-    sendJson(res, 200, menu);
+    if (error) {
+      console.error("Supabase menu error:", error);
 
-    return;
+      return sendJson(res, 500, {
+        message: "Menu load failed",
+        error: error.message,
+      });
+    }
+
+    const groupedMenu = [];
+
+    for (const item of data || []) {
+      let category = groupedMenu.find(
+        (group) => group.category === item.category
+      );
+
+      if (!category) {
+        category = {
+          category: item.category,
+          items: [],
+        };
+
+        groupedMenu.push(category);
+      }
+
+      category.items.push({
+        id: item.id,
+        name: item.name,
+        price: Number(item.price),
+        image: item.image || "",
+        available: item.available !== false,
+      });
+    }
+
+    return sendJson(res, 200, groupedMenu);
+  } catch (error) {
+    console.error("Menu error:", error);
+
+    return sendJson(res, 500, {
+      message: "Menu load failed",
+    });
   }
+}
 
   // =========================
   // ADD CATEGORY
@@ -606,61 +705,55 @@ if (req.method === "PATCH" && orderStatusMatch) {
   }
 
   // =========================
-  // DELETE DISH
-  // =========================
+// DELETE DISH FROM SUPABASE
+// =========================
 
-  if (
-    menuItemMatch &&
-    req.method === "DELETE"
-  ) {
-    try {
-      const itemId = decodeURIComponent(
-        menuItemMatch[1]
+if (
+  menuItemMatch &&
+  req.method === "DELETE"
+) {
+  try {
+    const itemId = decodeURIComponent(
+      menuItemMatch[1]
+    );
+
+    const { data, error } = await supabase
+      .from("menu")
+      .delete()
+      .eq("id", itemId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(
+        "Supabase menu delete error:",
+        error
       );
 
-      const menu = readJsonFile(MENU_FILE);
-
-      let deletedItem = null;
-
-      for (const category of menu) {
-        const index = category.items.findIndex(
-          (dish) => dish.id === itemId
-        );
-
-        if (index !== -1) {
-          deletedItem =
-            category.items.splice(index, 1)[0];
-
-          break;
-        }
-      }
-
-      if (!deletedItem) {
-        sendJson(res, 404, {
-          message: "Dish not found",
-        });
-
-        return;
-      }
-
-      writeJsonFile(MENU_FILE, menu);
-
-      sendJson(res, 200, {
-        message: "Dish deleted successfully!",
-        item: deletedItem,
-      });
-
-      return;
-    } catch (error) {
-      console.error(error);
-
-      sendJson(res, 400, {
+      return sendJson(res, 500, {
         message: "Could not delete dish",
+        error: error.message,
       });
-
-      return;
     }
+
+    if (!data) {
+      return sendJson(res, 404, {
+        message: "Dish not found",
+      });
+    }
+
+    return sendJson(res, 200, {
+      message: "Dish deleted successfully!",
+      item: data,
+    });
+  } catch (error) {
+    console.error("Delete dish error:", error);
+
+    return sendJson(res, 400, {
+      message: "Could not delete dish",
+    });
   }
+}
 // =========================
 // ADMIN LOGIN
 // =========================
@@ -686,6 +779,104 @@ if (req.method === "POST" && req.url === "/admin-login") {
     return sendJson(res, 500, {
       success: false,
       message: "Login failed",
+    });
+  }
+}
+// =========================
+// CREATE REVIEW
+// =========================
+
+if (req.method === "POST" && req.url === "/reviews") {
+  try {
+    const body = await getBody(req);
+
+    const name = String(body.name || "").trim();
+    const review = String(body.review || "").trim();
+    const rating = Number(body.rating);
+
+    if (!name || !review) {
+      return sendJson(res, 400, {
+        message: "Name and review are required",
+      });
+    }
+
+    if (
+      !Number.isInteger(rating) ||
+      rating < 1 ||
+      rating > 5
+    ) {
+      return sendJson(res, 400, {
+        message: "Rating must be between 1 and 5",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("reviews")
+      .insert([
+        {
+          name,
+          review,
+          rating,
+          approved: true,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase review error:", error);
+
+      return sendJson(res, 500, {
+        message: "Review save failed",
+        error: error.message,
+      });
+    }
+
+    return sendJson(res, 201, {
+      message: "Review submitted successfully!",
+      review: data,
+    });
+  } catch (error) {
+    console.error("Review error:", error);
+
+    return sendJson(res, 400, {
+      message: "Invalid review data",
+    });
+  }
+}
+
+// =========================
+// GET REVIEWS
+// =========================
+
+if (
+  req.method === "GET" &&
+  (req.url === "/reviews" || req.url === "/reviews/")
+) {
+  try {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("approved", true)
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      console.error("Supabase reviews error:", error);
+
+      return sendJson(res, 500, {
+        message: "Reviews load failed",
+        error: error.message,
+      });
+    }
+
+    return sendJson(res, 200, data || []);
+  } catch (error) {
+    console.error("Reviews error:", error);
+
+    return sendJson(res, 500, {
+      message: "Reviews load failed",
     });
   }
 }

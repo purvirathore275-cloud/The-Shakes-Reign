@@ -466,14 +466,6 @@
   },
   {
     "category": "Special combos",
-    "items": [
-      {
-        "name": "manchuria and fried rice",
-        "price": 399,
-        "image": "",
-        "available": true,
-        "id": "special-combos-1789719357307"
-      }
-    ]
+    "items": []
   }
 ]

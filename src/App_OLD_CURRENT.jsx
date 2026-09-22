@@ -1,5 +1,4 @@
-import QRCode from "qrcode";
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 import Admin from "./admin/Admin";
@@ -20,16 +19,6 @@ function App() {
   // =========================
 
   const [cart, setCart] = useState([]);
-  const [paymentOpen, setPaymentOpen] = useState(false);
-
-const [paymentData, setPaymentData] = useState({
-  qrCode: "",
-  upiUrl: "",
-  amount: "",
-  customerName: "",
-  customerPhone: "",
-  customerAddress: "",
-});
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -170,46 +159,6 @@ const [paymentData, setPaymentData] = useState({
   }, [trackingOrderId]);
 
   // =========================
-  // SECTION NAVIGATION
-  // =========================
-
-  const goToSection = (sectionId) => {
-    if (window.location.pathname !== "/") {
-      sessionStorage.setItem("scrollToSection", sectionId);
-      window.location.href = `/#${sectionId}`;
-      return;
-    }
-
-    document.getElementById(sectionId)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-
-    window.history.replaceState(
-      null,
-      "",
-      `#${sectionId}`
-    );
-  };
-
-  useEffect(() => {
-    const sectionId =
-      sessionStorage.getItem("scrollToSection") ||
-      window.location.hash.replace("#", "");
-
-    if (!sectionId) return;
-
-    sessionStorage.removeItem("scrollToSection");
-
-    setTimeout(() => {
-      document.getElementById(sectionId)?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 300);
-  }, []);
-
-  // =========================
   // ADD TO CART
   // =========================
 
@@ -300,69 +249,12 @@ const [paymentData, setPaymentData] = useState({
       sum + Number(item.quantity || 1),
     0
   );
-  // =========================
-// UPI PAYMENT
-// =========================
 
-const payOnline = async () => {
-  if (cart.length === 0) {
-    alert("Please add something to your cart first.");
-    return;
-  }
-
-  const customerName =
-    customerNameRef.current?.value || "";
-
-  const customerPhone =
-    customerPhoneRef.current?.value || "";
-
-  const customerAddress =
-    customerAddressRef.current?.value || "";
-
-  if (!customerName.trim()) {
-    alert("Please enter your name first.");
-    return;
-  }
-
-  if (!customerPhone.trim()) {
-    alert("Please enter your phone number first.");
-    return;
-  }
-
-  if (!customerAddress.trim()) {
-    alert("Please enter your delivery address first.");
-    return;
-  }
-
-  const upiUrl =
-    `upi://pay?pa=umasingh007@axisbank` +
-    `&pn=The%20Shakes%20Reign` +
-    `&am=${Number(total).toFixed(2)}` +
-    `&cu=INR` +
-    `&tn=The%20Shakes%20Reign%20Order`;
-
-  try {
-    const qrCode = await QRCode.toDataURL(upiUrl);
-
-    setPaymentData({
-  qrCode,
-  upiUrl,
-  amount: Number(total).toFixed(2),
-  customerName: customerName.trim(),
-  customerPhone: customerPhone.trim(),
-  customerAddress: customerAddress.trim(),
-});
-    setPaymentOpen(true);
-  } catch (error) {
-    console.error("QR generation error:", error);
-    alert("Payment QR create nahi ho paya. Please try again.");
-  }
-};
   // =========================
   // ORDER ON WHATSAPP
   // =========================
 
-  const orderOnWhatsApp = async (paidCustomer = null) => {
+  const orderOnWhatsApp = async () => {
     if (cart.length === 0) {
       alert(
         "Please add something to your cart first."
@@ -370,20 +262,10 @@ const payOnline = async () => {
       return;
     }
 
-    const customerName =
-  paidCustomer?.customerName ||
-  customerNameRef.current?.value ||
-  "";
+    const customerName = customerNameRef.current?.value || "";
+    const customerPhone = customerPhoneRef.current?.value || "";
+    const customerAddress = customerAddressRef.current?.value || "";
 
-const customerPhone =
-  paidCustomer?.customerPhone ||
-  customerPhoneRef.current?.value ||
-  "";
-
-const customerAddress =
-  paidCustomer?.customerAddress ||
-  customerAddressRef.current?.value ||
-  "";
     if (!customerName.trim()) {
       alert("Please enter your name.");
       return;
@@ -538,8 +420,21 @@ const customerAddress =
   // =========================
   // HOME PAGE
   // =========================
+useEffect(() => {
+  const sectionId = sessionStorage.getItem("scrollToSection");
 
-  const HomePage = () => {
+  if (sectionId) {
+    sessionStorage.removeItem("scrollToSection");
+
+    setTimeout(() => {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 300);
+  }
+}, []);
+const HomePage = () => {
     return (
       <div className="app">
 
@@ -558,15 +453,24 @@ const customerAddress =
             <Link to="/menu">Menu</Link>
             <a href="#about">About Us</a>
             <a
-              href="#reviews"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("reviews");
-                setMobileMenuOpen(false);
-              }}
-            >
-              Reviews
-            </a>
+  href="/"
+  onClick={(e) => {
+    e.preventDefault();
+
+    sessionStorage.setItem("scrollToSection", "reviews");
+
+    if (window.location.pathname === "/") {
+      document.getElementById("reviews")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      window.location.href = "/";
+    }
+  }}
+>
+  Reviews
+</a>
             <a href="#contact">Contact</a>
             <a href="#tracking">Track Order</a>
           </nav>
@@ -610,11 +514,26 @@ const customerAddress =
 
           <div className={`mobile-menu ${mobileMenuOpen ? "show" : ""}`}>
             <a
-              href="#home"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </a>
+  href="/"
+  onClick={(e) => {
+    e.preventDefault();
+
+    sessionStorage.setItem("scrollToSection", "reviews");
+
+    if (window.location.pathname === "/") {
+      document.getElementById("reviews")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      window.location.href = "/";
+    }
+
+    setMobileMenuOpen(false);
+  }}
+>
+  Reviews
+</a>
             <Link
               to="/menu"
               onClick={() => setMobileMenuOpen(false)}
@@ -741,70 +660,80 @@ const customerAddress =
 
         </section>
 
-        {/* ================= ABOUT US ================= */}
+{/* ================= ABOUT ================= */}
 
 <section
   id="about"
   className="about-section"
 >
+
   <div className="about-content">
 
     <p className="about-tag">
-      OUR STORY
+      ABOUT THE SHAKES REIGN
     </p>
 
     <h2>
-      The Story Behind{" "}
-      <span>The Shakes Reign</span>
+      A Dream That
+      <br />
+      <span>Lives On.</span>
     </h2>
 
     <p className="about-text">
-      The Shakes Reign began as a small cloud kitchen in 2019,
-      founded by our beloved <strong>son and brother, Varun Singh Rathore.</strong>
+      The Shakes Reign began as a small cloud
+      kitchen in 2019, founded by our beloved
+      <strong> (Son and brother) Varun Singh Rathore.</strong>
     </p>
 
     <p className="about-text">
-      After losing him in 2024, his parents and sisters revived
-      his dream in 2025. Today, we dream of taking his vision
-      from a small city to a global chain that cares about people,
-      animals, and every living being.
+      After losing him in 2024, his parents and
+      sisters revived his dream in 2025.
+    </p>
+
+    <p className="about-text">
+      Today, we dream of taking his vision from
+      a small city to a global chain that cares
+      for people, animals, and every living being.
+    </p>
+
+    <p className="about-text">
+      Every order, review, share, and kind word
+      makes you a part of this journey. Join us,
+      support his dream, and help us take it forward.
     </p>
 
     <div className="about-highlight">
       <span>❤️</span>
 
       <div>
-        <strong>Help us take his dream forward.</strong>
-
+        <strong>Be a part of Varun's journey.</strong>
         <p>
-          Every order, review, share, and kind word makes you
-          a part of this journey.
+          Together, let's take his dream forward.
         </p>
       </div>
     </div>
 
     <p className="about-connect">
-      Join us, support his dream, and help us take it forward.
-      To connect with Varun's journey, find us on{" "}
+      To connect with Varun’s journey, find us on
       <a
-        href="https://www.instagram.com/"
+        href="https://instagram.com/"
         target="_blank"
         rel="noreferrer"
       >
         Instagram
       </a>
-      {" "}and{" "}
+      and
       <a
         href="https://wa.me/919794428589"
         target="_blank"
         rel="noreferrer"
       >
         WhatsApp
-      </a>
-      .
+      </a>.
     </p>
 
   </div>
+
 </section>
         {/* ================= CONTACT ================= */}
 
@@ -1089,12 +1018,7 @@ const customerAddress =
                 </strong>
 
               </div>
-              <button
-  className="upi-payment-btn"
-  onClick={payOnline}
->
-  💳 Pay Online with UPI
-</button>
+
               <button
                 className="whatsapp-order-btn"
                 onClick={
@@ -1103,24 +1027,12 @@ const customerAddress =
               >
                 💬 Order on WhatsApp
               </button>
-              <button
-  className="whatsapp-order-btn"
-  onClick={payOnline}
-  style={{
-    marginTop: "10px",
-    background: "#3b7d3b",
-  }}
->
-  💳 Pay Online
-</button>
 
             </div>
 
           )}
 
         </section>
-
-        <CartUI />
 
         {/* ================= FOOTER ================= */}
 
@@ -1255,105 +1167,11 @@ const customerAddress =
                 >
                   💬 Order on WhatsApp
                 </button>
-
-                <button
-  className="whatsapp-order-btn"
-  onClick={payOnline}
-  style={{
-    marginTop: "10px",
-    background: "#3b7d3b",
-  }}
->
-  💳 Pay Online
-</button>
               </>
             )}
           </div>
         </div>
       )}
-      {paymentOpen && (
-  <div className="cart-popup-overlay">
-    <div className="cart-popup payment-popup">
-
-      <div className="cart-popup-header">
-        <h3>Pay Online</h3>
-
-        <button onClick={() => setPaymentOpen(false)}>
-          ✕
-        </button>
-      </div>
-
-      <p className="payment-amount">
-        Pay ₹{paymentData.amount}
-      </p>
-
-      <p className="payment-instruction">
-        Scan this QR using GPay, PhonePe, Paytm, Navi or any UPI app.
-      </p>
-<div className="upi-details">
-  <span>UPI ID</span>
-
-  <strong>umasingh007@axisbank</strong>
-
-  <button
-    type="button"
-    onClick={() => {
-      navigator.clipboard.writeText(
-        "umasingh007@axisbank"
-      );
-
-      alert("UPI ID copied!");
-    }}
-  >
-    📋 Copy UPI ID
-  </button>
-</div>
-      {paymentData.qrCode && (
-        <img
-          src={paymentData.qrCode}
-          alt="UPI Payment QR Code"
-          className="payment-qr"
-        />
-      )}
-
-      <button
-  type="button"
-  className="whatsapp-order-btn"
-  onClick={() => {
-    const isMobile =
-      /Android|iPhone|iPad|iPod/i.test(
-        navigator.userAgent
-      );
-
-    if (!isMobile) {
-      alert(
-        "Please scan the QR code using your phone's UPI app."
-      );
-      return;
-    }
-
-    window.location.href = paymentData.upiUrl;
-  }}
->
-  📱 Open UPI App
-</button>
-      <p className="payment-note">
-        Payment complete karne ke baad WhatsApp par order details send karein.
-      </p>
-      <button
-  type="button"
-  className="payment-paid-btn"
-  onClick={() => {
-    setPaymentOpen(false);
-    orderOnWhatsApp(paymentData);
-  }}
->
-  ✅ I Have Paid — Continue
-</button>
-
-    </div>
-  </div>
-)}
     </>
   );
 
@@ -1377,16 +1195,7 @@ const customerAddress =
             <Link to="/">Home</Link>
             <Link to="/menu">Menu</Link>
             <Link to="/#about">About Us</Link>
-            <a
-              href="#reviews"
-              onClick={(e) => {
-                e.preventDefault();
-                goToSection("reviews");
-                setMobileMenuOpen(false);
-              }}
-            >
-              Reviews
-            </a>
+            <Link to="/#reviews">Reviews</Link>
             <Link to="/#contact">Contact</Link>
           </nav>
 
@@ -1522,10 +1331,10 @@ const customerAddress =
                       >
                         <div className="menu-image">
                           <img
-                            src={item.image || "/logo.jpg"}
-                            alt={item.name}
-                            loading="lazy"
-                          />
+  src={item.image || "/logo.jpg"}
+  alt={item.name}
+  loading="lazy"
+/>
                         </div>
 
                         <div className="menu-card-content">
@@ -1552,8 +1361,6 @@ const customerAddress =
             </div>
           )}
         </main>
-
-        <CartUI />
 
         <footer>
           <p>© 2026 The Shakes Reign. All Rights Reserved.</p>
@@ -1585,7 +1392,7 @@ const customerAddress =
   // ROUTES
   // =========================
 
-  return (
+    return (
     <BrowserRouter>
 
       <Routes>
@@ -1607,181 +1414,11 @@ const customerAddress =
 
       </Routes>
 
+      {/* GLOBAL CART */}
+      <CartUI />
+
     </BrowserRouter>
   );
 }
-// =========================
-// LIVE REVIEWS COMPONENT
-// =========================
 
-function ReviewsSection() {
-  const [reviews, setReviews] = useState([]);
-  const [name, setName] = useState("");
-  const [reviewText, setReviewText] = useState("");
-  const [rating, setRating] = useState(5);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const REVIEWS_API = "http://localhost:5000/reviews";
-
-  const loadReviews = async () => {
-    try {
-      const response = await fetch(REVIEWS_API);
-
-      if (!response.ok) {
-        throw new Error("Reviews load failed");
-      }
-
-      const data = await response.json();
-      setReviews(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Reviews error:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadReviews();
-  }, []);
-
-  const submitReview = async (e) => {
-    e.preventDefault();
-
-    if (!name.trim() || !reviewText.trim()) {
-      setMessage("Please enter your name and review.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setMessage("");
-
-      const response = await fetch(REVIEWS_API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          review: reviewText.trim(),
-          rating: Number(rating),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Review submission failed");
-      }
-
-      setName("");
-      setReviewText("");
-      setRating(5);
-      setMessage("Thank you! Your review has been submitted. ❤️");
-
-      await loadReviews();
-    } catch (error) {
-      console.error("Review submit error:", error);
-      setMessage("Review submit nahi ho paya. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <section id="reviews" className="reviews-section">
-
-      <div className="reviews-heading">
-        <p className="section-tag">CUSTOMER LOVE</p>
-
-        <h2>
-          What Our <span>Customers Say</span>
-        </h2>
-
-        <p>
-          Loved by shake and food lovers.
-        </p>
-      </div>
-
-      {/* LIVE REVIEWS */}
-      <div className="reviews-grid">
-        {reviews.length > 0 ? (
-          reviews.map((review) => (
-            <div className="review-card" key={review.id}>
-
-              <div className="review-stars">
-                {"★".repeat(Number(review.rating))}
-                {"☆".repeat(5 - Number(review.rating))}
-              </div>
-
-              <p>“{review.review}”</p>
-
-              <strong>— {review.name}</strong>
-
-            </div>
-          ))
-        ) : (
-          <div className="no-reviews">
-            <p>Be the first to share your experience! ❤️</p>
-          </div>
-        )}
-      </div>
-
-      {/* WRITE A REVIEW */}
-      <div className="review-form-box">
-
-        <h3>Share Your Experience</h3>
-
-        <p>
-          Had a great shake or meal? Tell us what you think!
-        </p>
-
-        <form onSubmit={submitReview}>
-
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={50}
-          />
-
-          <div className="star-rating-input">
-  {[1, 2, 3, 4, 5].map((star) => (
-    <button
-      key={star}
-      type="button"
-      className={star <= Number(rating) ? "active" : ""}
-      onClick={() => setRating(star)}
-      aria-label={`${star} star rating`}
-    >
-      ★
-    </button>
-  ))}
-</div>
-
-          <textarea
-            placeholder="Write your review..."
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            rows="5"
-            maxLength={500}
-          />
-
-          <button type="submit" disabled={loading}>
-            {loading ? "Submitting..." : "Submit Review"}
-          </button>
-
-        </form>
-
-        {message && (
-          <p className="review-message">
-            {message}
-          </p>
-        )}
-
-      </div>
-
-    </section>
-  );
-}
 export default App;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Admin.css";
 
-const API = "https://the-shakes-reign.onrender.com";
+const API = "http://localhost:5000";
 function Admin() {
   const [orders, setOrders] = useState([]);
   const [menu, setMenu] = useState([]);
@@ -72,6 +72,40 @@ const updateOrderStatus = async (orderId, status) => {
   }
 };
 
+
+// =========================
+// UPDATE PAYMENT STATUS
+// =========================
+
+const updatePaymentStatus = async (orderId, payment_status) => {
+  try {
+    const response = await fetch(
+      `${API}/orders/${encodeURIComponent(orderId)}/payment-status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          payment_status,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Could not update payment status.");
+      return;
+    }
+
+    await loadOrders();
+  } catch (error) {
+    console.error("Payment status update error:", error);
+    alert("Backend connection failed.");
+  }
+};
+
   // =========================
   // LOAD MENU
   // =========================
@@ -80,10 +114,7 @@ const updateOrderStatus = async (orderId, status) => {
   try {
     setLoadingMenu(true);
 
-    const response = await fetch(
-      "https://the-shakes-reign.onrender.com/menu"
-    );
-
+    const response = await fetch(`${API}/menu`);
     if (!response.ok) {
       throw new Error(`Menu API error: ${response.status}`);
     }
@@ -171,7 +202,7 @@ const addCategory = async () => {
   }
 
   try {
-    const response = await fetch(`${API}/menu/category`, {
+    const response = await fetch(`${MENU_API}/menu/category`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -212,7 +243,7 @@ const addCategory = async () => {
     }
 
     try {
-      const response = await fetch(`${API}/menu`, {
+      const response = await fetch(`${MENU_API}/menu`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -259,7 +290,7 @@ const addCategory = async () => {
 
   try {
     const response = await fetch(
-      `${API}/menu/${encodeURIComponent(id)}/toggle`,
+  `${MENU_API}/menu/${encodeURIComponent(id)}/toggle`,
       {
         method: "PATCH",
       }
@@ -293,7 +324,7 @@ const addCategory = async () => {
 
     try {
       const response = await fetch(
-        `${API}/menu/${encodeURIComponent(id)}`,
+  `${MENU_API}/menu/${encodeURIComponent(id)}`,
         {
           method: "DELETE",
         }
@@ -554,6 +585,41 @@ const addCategory = async () => {
 
               <option value="Completed">
                 Completed
+              </option>
+            </select>
+
+          </div>
+
+
+          <div className="payment-status-control">
+
+            <label>
+              Payment Status
+            </label>
+
+            <select
+              value={order.payment_status || "Not Paid"}
+              onChange={(e) =>
+                updatePaymentStatus(
+                  order.id,
+                  e.target.value
+                )
+              }
+            >
+              <option value="Not Paid">
+                🔴 Not Paid
+              </option>
+
+              <option value="Pending Verification">
+                🟠 Pending Verification
+              </option>
+
+              <option value="Verified">
+                🟢 Verified
+              </option>
+
+              <option value="Rejected">
+                ❌ Rejected
               </option>
             </select>
 
