@@ -950,3 +950,17 @@ a {
   font-weight: 700;
   text-decoration: none;
 }
+/* FINAL FIX - ABOUT CONNECT TEXT */
+
+.about-section .about-content .about-connect {
+  color: #6b2a2a !important;
+  font-size: 15px !important;
+  line-height: 1.8 !important;
+  font-weight: 500 !important;
+}
+
+.about-section .about-content .about-connect a {
+  color: #a51d2d !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
