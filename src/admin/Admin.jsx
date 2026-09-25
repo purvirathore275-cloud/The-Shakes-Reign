@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Admin.css";
 
-const API = "http://localhost:5000";
+const API = "https://the-shakes-reign.onrender.com";
 function Admin() {
   const [orders, setOrders] = useState([]);
   const [menu, setMenu] = useState([]);
@@ -12,6 +12,11 @@ function Admin() {
   const [search, setSearch] = useState("");
 
   const [activeTab, setActiveTab] = useState("orders");
+  const [newOrderAlert, setNewOrderAlert] = useState(null);
+
+  const knownOrderIdsRef = useRef(new Set());
+  const hasInitialOrderSnapshotRef = useRef(false);
+  const activeAlertOrderIdRef = useRef(null);
 
   const [dish, setDish] = useState({
     name: "",
@@ -24,21 +29,163 @@ function Admin() {
   // LOAD ORDERS
   // =========================
 
-  const loadOrders = async () => {
-    setLoadingOrders(true);
+  const orderAudioRef = useRef(null);
+  const audioUnlockedRef = useRef(false);
+
+  const armOrderAudio = async () => {
+    try {
+      const audio = orderAudioRef.current;
+      if (!audio || audioUnlockedRef.current) return;
+
+      audio.loop = true;
+      audio.muted = true;
+      audio.volume = 0;
+      audio.currentTime = 0;
+      await audio.play();
+      audioUnlockedRef.current = true;
+
+      if (activeAlertOrderIdRef.current) {
+        audio.currentTime = 0;
+        audio.muted = false;
+        audio.volume = 1;
+      }
+    } catch (error) {
+      console.warn("Order alert audio waiting for page interaction.");
+    }
+  };
+
+  const playOrderBell = () => {
+    try {
+      const audio = orderAudioRef.current;
+      if (!audio || !audioUnlockedRef.current) return;
+      audio.loop = true;
+      audio.currentTime = 0;
+      audio.muted = false;
+      audio.volume = 1;
+      const promise = audio.play();
+      if (promise && typeof promise.catch === "function") promise.catch(() => {});
+    } catch (error) {
+      console.error("Order alert audio error:", error);
+    }
+  };
+
+  const stopOrderAlertSound = () => {
+    const audio = orderAudioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.muted = true;
+    audio.volume = 0;
+  };
+
+  const startOrderAlertSound = (orderId) => {
+    activeAlertOrderIdRef.current = String(orderId);
+    playOrderBell();
+  };
+
+  useEffect(() => {
+    const audio = new Audio("/traveloka.mp3");
+    audio.preload = "auto";
+    audio.loop = true;
+    audio.volume = 0;
+    audio.muted = true;
+    orderAudioRef.current = audio;
+
+    // No Alert On button. Any normal Admin-page interaction unlocks audio.
+    const unlock = () => { armOrderAudio(); };
+    window.addEventListener("pointerdown", unlock, { passive: true });
+    window.addEventListener("keydown", unlock, { passive: true });
+    window.addEventListener("touchstart", unlock, { passive: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+      window.removeEventListener("touchstart", unlock);
+      audio.pause();
+      audio.src = "";
+      orderAudioRef.current = null;
+    };
+  }, []);
+
+  const testOrderSound = async () => {
+    try {
+      await armOrderAudio();
+      const audio = orderAudioRef.current;
+      if (!audio) return;
+      audio.loop = false;
+      audio.muted = false;
+      audio.volume = 1;
+      audio.currentTime = 0;
+      await audio.play();
+      setTimeout(() => {
+        const current = orderAudioRef.current;
+        if (!current) return;
+        current.pause();
+        current.currentTime = 0;
+        current.loop = true;
+        current.muted = true;
+        current.volume = 0;
+      }, 5000);
+    } catch (error) {
+      alert("Sound play nahi hua. Check karo ki public folder ke andar traveloka.mp3 hai.");
+    }
+  };
+
+  const loadOrders = async ({ notify = false } = {}) => {
+    if (!notify) {
+      setLoadingOrders(true);
+    }
 
     try {
       const response = await fetch(`${API}/orders`);
       const data = await response.json();
 
-      setOrders(Array.isArray(data) ? data : []);
+      const nextOrders = Array.isArray(data) ? data : [];
+
+      // Stop the repeating alert as soon as the active order is no longer Pending.
+      if (activeAlertOrderIdRef.current) {
+        const activeOrder = nextOrders.find(
+          (order) => String(order.id) === String(activeAlertOrderIdRef.current)
+        );
+
+        if (activeOrder && String(activeOrder.status || "Pending").trim().toLowerCase() !== "pending") {
+          stopOrderAlertSound();
+          activeAlertOrderIdRef.current = null;
+          setNewOrderAlert(null);
+        }
+      }
+
+      if (notify && hasInitialOrderSnapshotRef.current) {
+        const newOrder = nextOrders.find(
+          (order) => !knownOrderIdsRef.current.has(String(order.id))
+        );
+
+        if (newOrder) {
+          setNewOrderAlert(newOrder);
+
+          startOrderAlertSound(newOrder.id);
+        }
+      }
+
+      knownOrderIdsRef.current = new Set(
+        nextOrders.map((order) => String(order.id))
+      );
+
+      hasInitialOrderSnapshotRef.current = true;
+      setOrders(nextOrders);
     } catch (error) {
       console.error("Orders error:", error);
-      setOrders([]);
+
+      if (!notify) {
+        setOrders([]);
+      }
     } finally {
-      setLoadingOrders(false);
+      if (!notify) {
+        setLoadingOrders(false);
+      }
     }
   };
+
   // =========================
 // UPDATE ORDER STATUS
 // =========================
@@ -63,6 +210,14 @@ const updateOrderStatus = async (orderId, status) => {
     if (!response.ok) {
       alert(data.message || "Could not update order status.");
       return;
+    }
+
+    if (String(status).trim().toLowerCase() !== "pending") {
+      stopOrderAlertSound();
+      if (String(activeAlertOrderIdRef.current) === String(orderId)) {
+        activeAlertOrderIdRef.current = null;
+        setNewOrderAlert(null);
+      }
     }
 
     await loadOrders();
@@ -114,7 +269,10 @@ const updatePaymentStatus = async (orderId, payment_status) => {
   try {
     setLoadingMenu(true);
 
-    const response = await fetch(`${API}/menu`);
+    const response = await fetch(
+      "https://the-shakes-reign.onrender.com/menu"
+    );
+
     if (!response.ok) {
       throw new Error(`Menu API error: ${response.status}`);
     }
@@ -142,6 +300,15 @@ const updatePaymentStatus = async (orderId, payment_status) => {
   useEffect(() => {
     loadOrders();
     loadMenu();
+
+    const orderPolling = setInterval(() => {
+      loadOrders({ notify: true });
+    }, 10000);
+
+    return () => {
+      clearInterval(orderPolling);
+      stopOrderAlertSound();
+    };
   }, []);
 
   // =========================
@@ -202,7 +369,7 @@ const addCategory = async () => {
   }
 
   try {
-    const response = await fetch(`${MENU_API}/menu/category`, {
+    const response = await fetch(`${API}/menu/category`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -243,7 +410,7 @@ const addCategory = async () => {
     }
 
     try {
-      const response = await fetch(`${MENU_API}/menu`, {
+      const response = await fetch(`${API}/menu`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -290,7 +457,7 @@ const addCategory = async () => {
 
   try {
     const response = await fetch(
-  `${MENU_API}/menu/${encodeURIComponent(id)}/toggle`,
+      `${API}/menu/${encodeURIComponent(id)}/toggle`,
       {
         method: "PATCH",
       }
@@ -324,7 +491,7 @@ const addCategory = async () => {
 
     try {
       const response = await fetch(
-  `${MENU_API}/menu/${encodeURIComponent(id)}`,
+        `${API}/menu/${encodeURIComponent(id)}`,
         {
           method: "DELETE",
         }
@@ -357,13 +524,136 @@ const addCategory = async () => {
           <p>Restaurant Admin Dashboard</p>
         </div>
 
-        <button
-          className="refresh-btn"
-          onClick={refreshAll}
-        >
-          ↻ Refresh
-        </button>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <button
+            className="refresh-btn"
+            onClick={refreshAll}
+            type="button"
+          >
+            ↻ Refresh
+          </button>
+        </div>
       </header>
+
+      {/* ================= NEW ORDER ALERT ================= */}
+
+      {newOrderAlert && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background: "rgba(0, 0, 0, 0.65)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "420px",
+              background: "#fff",
+              borderRadius: "22px",
+              padding: "30px",
+              textAlign: "center",
+              boxShadow: "0 25px 70px rgba(0,0,0,0.35)",
+              border: "3px solid #b40000",
+              animation: "newOrderPop 0.35s ease-out",
+            }}
+          >
+            <div style={{ fontSize: "58px", marginBottom: "8px" }}>🔔</div>
+
+            <h2
+              style={{
+                margin: "0 0 10px",
+                color: "#b40000",
+                fontSize: "28px",
+              }}
+            >
+              NEW ORDER RECEIVED!
+            </h2>
+
+            <p
+              style={{
+                margin: "8px 0",
+                fontWeight: "700",
+                fontSize: "18px",
+              }}
+            >
+              Order #{newOrderAlert.id}
+            </p>
+
+            <p style={{ margin: "8px 0" }}>
+              👤 {newOrderAlert.customer_name || "Customer"}
+            </p>
+
+            <p
+              style={{
+                margin: "8px 0 22px",
+                fontSize: "24px",
+                fontWeight: "800",
+                color: "#b40000",
+              }}
+            >
+              ₹{newOrderAlert.total || 0}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setNewOrderAlert(null);
+                setActiveTab("orders");
+              }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                border: "none",
+                borderRadius: "12px",
+                background: "#b40000",
+                color: "#fff",
+                fontSize: "16px",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              View Order
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNewOrderAlert(null)}
+              style={{
+                width: "100%",
+                marginTop: "10px",
+                padding: "11px",
+                border: "1px solid #ddd",
+                borderRadius: "12px",
+                background: "#fff",
+                color: "#333",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes newOrderPop {
+          from {
+            opacity: 0;
+            transform: scale(0.85);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
 
       {/* ================= MAIN ================= */}
 
@@ -577,6 +867,10 @@ const addCategory = async () => {
 
               <option value="Confirmed">
                 Confirmed
+              </option>
+
+              <option value="Rejected">
+                Rejected
               </option>
 
               <option value="Preparing">

@@ -760,3 +760,193 @@ footer{padding:30px 7%;display:flex;align-items:center;justify-content:space-bet
   border-color: #8f1d2c;
   box-shadow: 0 0 0 3px rgba(143, 29, 44, 0.08);
 }
+/* ================= PROFESSIONAL CONTACT ================= */
+
+.contact-section {
+  text-align: center;
+  padding: 90px 20px;
+  background: #fffaf5;
+}
+
+.contact-section h2 {
+  margin-bottom: 15px;
+}
+
+.contact-section h2 span {
+  color: #b40000;
+}
+
+.contact-subtitle {
+  max-width: 600px;
+  margin: 0 auto 40px;
+  color: #666;
+  line-height: 1.7;
+}
+
+.contact-buttons {
+  max-width: 720px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px 20px;
+  background: #ffffff;
+  color: #222;
+  text-decoration: none;
+  border: 1px solid #eadede;
+  border-radius: 16px;
+  text-align: left;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  transform: translateY(-5px);
+  border-color: #b40000;
+  box-shadow: 0 14px 30px rgba(180, 0, 0, 0.14);
+}
+
+.contact-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #fff1f1;
+  color: #b40000;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.contact-btn strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.contact-btn small {
+  display: block;
+  color: #777;
+  font-size: 13px;
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+
+  .contact-section {
+    padding: 70px 18px;
+  }
+
+  .contact-buttons {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .contact-btn {
+    padding: 16px;
+  }
+
+}
+/* About Story - Closing Text */
+.about-section > p:last-of-type {
+  color: #6b2a2a !important;
+}
+
+.about-section > p:last-of-type a {
+  color: #a51d2d !important;
+  font-weight: 700;
+}
+/* About - Closing Connect Text */
+.about-connect {
+  color: #6b2a2a !important;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.about-connect a {
+  color: #a51d2d !important;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.about-connect a:hover {
+  color: #7f1622 !important;
+  text-decoration: underline;
+}
+/* ================= MOBILE / IPHONE FIX ================= */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+a {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .app,
+  main,
+  section,
+  header,
+  footer {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .container,
+  .hero,
+  .about-section,
+  .contact-section,
+  .menu-section,
+  .reviews-section,
+  .cart-section {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+  }
+
+}
+.about-connect {
+  color: #6b2a2a !important;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.about-connect a {
+  color: #a51d2d !important;
+  font-weight: 700;
+  text-decoration: none;
+}

@@ -413,6 +413,11 @@ const customerAddress =
     };
 
     try {
+      // Open a blank WhatsApp tab immediately from the button click.
+      // This prevents the browser popup blocker from blocking WhatsApp
+      // after the backend request finishes.
+      const whatsappWindow = window.open("about:blank", "_blank");
+
       const response = await fetch(
         `${API}/orders`,
         {
@@ -483,18 +488,16 @@ const customerAddress =
         `${orderText}\n\n` +
         `Total: ₹${total}`;
 
-      const whatsappWindow = window.open(
+      const whatsappUrl =
         `https://wa.me/919794428589?text=${encodeURIComponent(
           message
-        )}`,
-        "_blank"
-      );
+        )}`;
 
-      if (!whatsappWindow) {
-        alert(
-          "Please allow popups in your browser to continue with WhatsApp."
-        );
-        return;
+      if (whatsappWindow) {
+        whatsappWindow.location.href = whatsappUrl;
+      } else {
+        // Fallback if the browser blocked the blank tab.
+        window.location.href = whatsappUrl;
       }
 
       // Close cart
@@ -806,38 +809,106 @@ const customerAddress =
 
   </div>
 </section>
-        {/* ================= CONTACT ================= */}
+{/* ================= CONTACT ================= */}
 
-        <section
-          id="contact"
-          className="contact-section"
-        >
+<section
+  id="contact"
+  className="contact-section"
+>
 
-          <p className="section-tag">
-            GET IN TOUCH
-          </p>
+  <p className="section-tag">
+    GET IN TOUCH
+  </p>
 
-          <h2>
-            Ready to satisfy
-            your craving?
-          </h2>
+  <h2>
+    Let's <span>Connect</span>
+  </h2>
 
-          <p>
-            Have a craving?
-            Let The Shakes Reign
-            satisfy it!
-          </p>
+  <p className="contact-subtitle">
+    Have a craving, a question, or just want to connect?
+    We would love to hear from you.
+  </p>
 
-          <a
-            href="https://wa.me/919794428589"
-            className="primary-btn"
-            target="_blank"
-            rel="noreferrer"
-          >
-            💬 Order on WhatsApp
-          </a>
+  <div className="contact-buttons">
 
-        </section>
+    <a
+      href="https://wa.me/919794428589"
+      className="contact-btn whatsapp-btn"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="contact-icon">💬</span>
+      <span>
+        <strong>WhatsApp</strong>
+        <small>Order & Chat With Us</small>
+      </span>
+    </a>
+
+    <a
+  href="https://www.instagram.com/theunderratedhuman_/"
+  className="contact-btn instagram-btn"
+  target="_blank"
+  rel="noreferrer"
+>
+  <span className="contact-icon">📸</span>
+  <span>
+    <strong>Instagram</strong>
+    <small>@theunderratedhuman_</small>
+  </span>
+</a>
+
+<a
+  href="https://www.instagram.com/the.shakes.reign_/"
+  className="contact-btn instagram-btn"
+  target="_blank"
+  rel="noreferrer"
+>
+  <span className="contact-icon">📸</span>
+  <span>
+    <strong>Instagram</strong>
+    <small>@the.shakes.reign_</small>
+  </span>
+</a>
+    <a
+      href="mailto:theshakesreign@gmail.com"
+      className="contact-btn email-btn"
+    >
+      <span className="contact-icon">✉️</span>
+      <span>
+        <strong>Email Us</strong>
+        <small>theshakesreign@gmail.com</small>
+      </span>
+    </a>
+
+    <a
+      href="https://www.facebook.com/share/1Avid6KZPU/"
+      className="contact-btn facebook-btn"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="contact-icon">f</span>
+      <span>
+        <strong>Facebook</strong>
+        <small>Follow Our Journey</small>
+      </span>
+    </a>
+
+    <a
+      href="https://zomato.onelink.me/xqzv/ijomh2h0"
+      className="contact-btn zomato-btn"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className="contact-icon">🍽️</span>
+      <span>
+        <strong>Order on Zomato</strong>
+        <small>Find Us on Zomato</small>
+      </span>
+    </a>
+
+  </div>
+
+</section>
 
         {/* ================= CUSTOMER TRACKING ================= */}
 
