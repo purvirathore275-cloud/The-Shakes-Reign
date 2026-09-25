@@ -964,3 +964,19 @@ a {
   font-weight: 700 !important;
   text-decoration: none !important;
 }
+/* FINAL MOBILE NAVBAR FIX */
+
+@media (max-width: 850px) {
+  .navbar {
+    overflow: visible !important;
+  }
+
+  .navbar .mobile-menu {
+    z-index: 2000 !important;
+  }
+
+  .navbar .hamburger-btn {
+    position: relative !important;
+    z-index: 2001 !important;
+  }
+}
