@@ -37,6 +37,127 @@ const [paymentData, setPaymentData] = useState({
   const customerPhoneRef = useRef(null);
   const customerAddressRef = useRef(null);
 
+  const [deliveryCheck, setDeliveryCheck] = useState({
+  checked: false,
+  available: false,
+  message: "",
+  loading: false,
+});
+
+  // =========================
+// DELIVERY SERVICEABILITY
+// =========================
+
+const checkDeliveryLocation = () => {
+  if (!navigator.geolocation) {
+    setDeliveryCheck({
+      checked: false,
+      available: false,
+      message:
+        "Location service is not supported by this browser.",
+      loading: false,
+    });
+    return;
+  }
+
+  setDeliveryCheck({
+    checked: false,
+    available: false,
+    message: "Checking your delivery location...",
+    loading: true,
+  });
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      // Save customer's exact location for WhatsApp
+      window.__customerLocation =
+        `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      try {
+        const response = await fetch(
+          `${API}/check-delivery`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              latitude,
+              longitude,
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Delivery check failed."
+          );
+        }
+
+        setDeliveryCheck({
+          checked: true,
+          available: Boolean(data.available),
+          message:
+            data.message ||
+            "Sorry, we don't deliver to this location yet.",
+          loading: false,
+        });
+      } catch (error) {
+        console.error(
+          "Delivery check error:",
+          error
+        );
+
+        setDeliveryCheck({
+          checked: false,
+          available: false,
+          message:
+            "Could not check this location. Please try again.",
+          loading: false,
+        });
+      }
+    },
+    (error) => {
+      console.error(
+        "Delivery location error:",
+        error
+      );
+
+      setDeliveryCheck({
+        checked: false,
+        available: false,
+        message:
+          "Please allow location access to confirm delivery availability.",
+        loading: false,
+      });
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000,
+    }
+  );
+};
+
+const ensureDeliveryAvailable = () => {
+  if (
+    !deliveryCheck.checked ||
+    !deliveryCheck.available
+  ) {
+    alert(
+      "Please confirm your delivery location first."
+    );
+    return false;
+  }
+
+  return true;
+};
+
   // =========================
   // MENU
   // =========================
@@ -334,6 +455,10 @@ const payOnline = async () => {
     return;
   }
 
+  if (!ensureDeliveryAvailable()) {
+    return;
+  }
+
   const upiUrl =
     `upi://pay?pa=umasingh007@axisbank` +
     `&pn=The%20Shakes%20Reign` +
@@ -384,6 +509,7 @@ const customerAddress =
   paidCustomer?.customerAddress ||
   customerAddressRef.current?.value ||
   "";
+
     if (!customerName.trim()) {
       alert("Please enter your name.");
       return;
@@ -396,6 +522,10 @@ const customerAddress =
 
     if (!customerAddress.trim()) {
       alert("Please enter your delivery address.");
+      return;
+    }
+
+    if (!ensureDeliveryAvailable()) {
       return;
     }
 
@@ -479,12 +609,17 @@ const customerAddress =
         )
         .join("\n");
 
+      const locationText = window.__customerLocation
+        ? `\n📍 Current Location:\n${window.__customerLocation}\n`
+        : "";
+
       const message =
         `Hello, I want to order:\n\n` +
         `Order ID: #${newOrderId}\n` +
         `Name: ${customerName.trim()}\n` +
         `Phone: ${customerPhone.trim()}\n` +
-        `Address: ${customerAddress.trim()}\n\n` +
+        `Address: ${customerAddress.trim()}\n` +
+        `${locationText}\n` +
         `${orderText}\n\n` +
         `Total: ₹${total}`;
 
@@ -1275,12 +1410,44 @@ const customerAddress =
                     placeholder="Phone Number"
                     ref={customerPhoneRef}
                   />
+                  <button
+                    type="button"
+                    onClick={checkDeliveryLocation}
+                    style={{
+                      marginTop: "10px",
+                      width: "100%",
+                      padding: "10px 14px",
+                      border: "none",
+                      borderRadius: "10px",
+                      background: "#a51d2d",
+                      color: "#fff",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    📍 Use Current Location
+                  </button>
+
+                  {deliveryCheck.message && (
+                    <p
+                      style={{
+                        margin: "8px 0 0",
+                        fontSize: "12px",
+                        lineHeight: "1.5",
+                        color: deliveryCheck.available ? "#247a35" : "#a51d2d",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {deliveryCheck.message}
+                    </p>
+                  )}
 
                   <textarea
-                    placeholder="Delivery Address"
+                    placeholder="Enter your complete delivery address"
                     ref={customerAddressRef}
                     rows="3"
                   />
+
                 </div>
 
                 <div className="cart-popup-items">
@@ -1563,6 +1730,7 @@ const customerAddress =
               Fresh shakes, lassi, food and beverages — made to
               order.
             </p>
+
           </div>
 
           {menuLoading ? (

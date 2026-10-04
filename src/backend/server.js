@@ -121,6 +121,120 @@ const server = http.createServer(async (req, res) => {
 
     return;
   }
+  // =========================
+  // CHECK DELIVERY LOCATION
+  // =========================
+
+  if (
+    req.method === "POST" &&
+    req.url === "/check-delivery"
+  ) {
+    try {
+      const body = await getBody(req);
+
+      const latitude = Number(body.latitude);
+      const longitude = Number(body.longitude);
+
+      if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        return sendJson(res, 400, {
+          available: false,
+          message: "Invalid location.",
+        });
+      }
+
+      // INTERNAL DELIVERY ZONES
+      // Customer ko ye details kabhi return nahi hongi.
+      const deliveryZones = [
+        {
+          latitude: 27.3895,
+          longitude: 79.5791,
+          radiusKm: 10,
+        },
+        {
+          latitude: 27.3633,
+          longitude: 79.62795,
+          radiusKm: 5,
+        },
+      ];
+
+      // Haversine distance calculation
+      function calculateDistanceKm(
+        lat1,
+        lon1,
+        lat2,
+        lon2
+      ) {
+        const earthRadiusKm = 6371;
+
+        const dLat =
+          ((lat2 - lat1) * Math.PI) / 180;
+
+        const dLon =
+          ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+          Math.sin(dLat / 2) *
+            Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+
+        const c =
+          2 *
+          Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+          );
+
+        return earthRadiusKm * c;
+      }
+
+      const available = deliveryZones.some(
+        (zone) => {
+          const distance = calculateDistanceKm(
+            latitude,
+            longitude,
+            zone.latitude,
+            zone.longitude
+          );
+
+          return distance <= zone.radiusKm;
+        }
+      );
+
+      if (available) {
+        return sendJson(res, 200, {
+          available: true,
+          message:
+            "Delivery is available at this location.",
+        });
+      }
+
+      return sendJson(res, 200, {
+        available: false,
+        message:
+          "Sorry, we don't deliver to this location yet.",
+      });
+    } catch (error) {
+      console.error(
+        "Delivery check error:",
+        error
+      );
+
+      return sendJson(res, 400, {
+        available: false,
+        message: "Could not check this location.",
+      });
+    }
+  }
 
   // =========================
   // CREATE ORDER

@@ -980,3 +980,44 @@ a {
     z-index: 2001 !important;
   }
 }
+/* =========================
+   DELIVERY CITY SELECT FIX
+========================= */
+
+.customer-details-form {
+  position: relative;
+  z-index: 2;
+}
+
+.customer-details-form select {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  margin: 0 0 10px !important;
+  padding: 12px 14px !important;
+
+  border: 1px solid #ddd !important;
+  border-radius: 9px !important;
+
+  background: #fff !important;
+  color: #222 !important;
+
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 100001 !important;
+
+  outline: none !important;
+  appearance: auto !important;
+}
+
+.customer-details-form select:focus {
+  border-color: #b40000 !important;
+  box-shadow: 0 0 0 3px rgba(180, 0, 0, 0.08) !important;
+}
